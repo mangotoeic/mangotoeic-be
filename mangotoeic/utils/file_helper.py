@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import os
 import pandas as pd
 import xlrd
-import googlemaps
+# import googlemaps
 import json
 '''
 pandas version 1.x 이상 endcoding='UTF-8' 불필요
