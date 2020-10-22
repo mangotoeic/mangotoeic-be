@@ -8,13 +8,13 @@ def Vocab(Resrouce):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, required=False, help='This field cannot be left blank')
         parser.add_argument('user_id', type=int, required=False, help='This field cannot be left blank')
-        parser.add_argument('vocabid', type=int, required=False, help='This field cannot be left blank')
-        parser.add_argument('answer', type=str, required=False, help='This field cannot be left blank')
-        parser.add_argument('Qid', type=int, required=False, help='This field cannot be left blank')
+        parser.add_argument('vocabId', type=int, required=False, help='This field cannot be left blank')
+        parser.add_argument('vocab', type=str, required=False, help='This field cannot be left blank')
+        parser.add_argument('qId', type=int, required=False, help='This field cannot be left blank')
     
     def post(self):
         data = self.parser.parse_args()
-        vocab = VocabDto(data['user_id'], data['vocabid'], data['answer'], data['Qid'])
+        vocab = VocabDto(data['user_id'], data['vocabId'], data['vocab'], data['qId'])
         try:
             vocab.save()
         except:
@@ -31,8 +31,8 @@ def Vocab(Resrouce):
         data = Vocab.parser.parse_args()
         vocab = VocabDao.find_by_id(id)
 
-        vocab.vocab_id = data['vocabid']
-        vocab.answer = data['answer']
+        vocab.vocab_id = data['vocabId']
+        vocab.vocab = data['vocab']
         vocab.save()
         return vocab.json()
 
