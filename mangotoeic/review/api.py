@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse
-from mangotoeic.reviewboard.dao import ReviewDao
-from mangotoeic.reviewboard.dto import ReviewDto
+from mangotoeic.review.dao import ReviewDao
+from mangotoeic.review.dto import ReviewDto
 
 
 class Review(Resource):
