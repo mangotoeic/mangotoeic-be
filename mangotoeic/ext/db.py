@@ -23,4 +23,4 @@ Base = declarative_base()
 engine = create_engine(url)
 Session = sessionmaker(bind=engine)
 def openSession():
-    ...
+    sessionmaker(bind=engine)
