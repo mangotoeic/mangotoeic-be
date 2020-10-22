@@ -7,11 +7,11 @@ class OdapDao():
         return cls.query.all
     
     @classmethod
-    def add_odap(cls, userid, Qid, newq):
-        add_odap = cls.query.filter(userid == userid, Qid != Qid).add(newq)
+    def add_odap(cls, userid, qId, newq):
+        add_odap = cls.query.filter(userid == userid, qId != qId).add(newq)
         return add_odap
     
     @classmethod
-    def delete_odap(cls, userid, Qid):
-        del_odap = cls.query.filter(userid == userid, Qid == Qid).delete(Qid)
+    def delete_odap(cls, userid, qId):
+        del_odap = cls.query.filter(userid == userid, qId == qId).delete(qId)
         return del_odap

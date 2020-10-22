@@ -7,7 +7,7 @@ class NewQ(Resource):
     def __init__(self):
         parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
         parser.add_argument('id', type=int, required=False, help='This field cannot be left blank')
-        parser.add_argument('Qid', type=int, required=False, help='This field cannot be left blank')
+        parser.add_argument('qId', type=int, required=False, help='This field cannot be left blank')
         parser.add_argument('AnsA', type=str, required=False, help='This field cannot be left blank')
         parser.add_argument('AnsB', type=str, required=False, help='This field cannot be left blank')
         parser.add_argument('AnsC', type=str, required=False, help='This field cannot be left blank')

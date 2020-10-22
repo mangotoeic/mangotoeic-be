@@ -9,7 +9,7 @@ class User(Resource):
         parser.add_argument('user_id', type=str, required=True, help='This field cannot be left blank')
         # parser.add_argument('user_name', type=str, required=True, help='Must enter the store id')
         # parser.add_argument('password', type=str, required=True, help='Must enter the store id')
-        parser.add_argument('Qid', type=int, required=True, help='Must enter the store id')
+        parser.add_argument('qId', type=int, required=True, help='Must enter the store id')
         parser.add_argument('user_answer', type=int, required=True, help='Must enter the store id')
         parser.add_argument('answered_correctly', type=int, required=True, help='Must enter the store id')
         parser.add_argument('prior_question_elapsed_time', type=int, required=True, help='Must enter the store id')

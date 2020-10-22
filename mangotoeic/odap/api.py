@@ -8,11 +8,11 @@ def Odap(Resrouce):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, required=False, help='This field cannot be left blank')
         parser.add_argument('user_id', type=int, required=False, help='This field cannot be left blank')
-        parser.add_argument('Qid', type=int, required=False, help='This field cannot be left blank')
+        parser.add_argument('qId', type=int, required=False, help='This field cannot be left blank')
     
     def post(self):
         data = self.parser.parse_args()
-        odap = OdapDto(data['user_id'], data['Qid'])
+        odap = OdapDto(data['user_id'], data['qId'])
         try:
             odap.save()
         except:
@@ -29,7 +29,7 @@ def Odap(Resrouce):
         data = Odap.parser.parse_args()
         odap = OdapDao.find_by_id(id)
 
-        odap.Qid = data['Qid']
+        odap.qId = data['qId']
         odap.save()
         return odap.json()
 

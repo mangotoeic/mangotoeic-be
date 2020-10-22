@@ -1,42 +1,41 @@
 from mangotoeic.ext.db import db
 
 class  NewQDto(db.Model):
-    __tablename__ ="NewQ"
+    __tablename__ ="newQs"
     __table_args__={'mysql_collate':'utf8_general_ci'}
-    id = db.Column(db.Integer, primary_key = True, index = True)
-
-    Qid = db.Column(db.Integer)
+    qId = db.Column(db.Integer, primary_key = True, index = True)
     question = db.Column(db.VARCHAR(300))
-    AnsA = db.Column(db.CHAR(10))
-    AnsB = db.Column(db.CHAR(10))
-    AnsC = db.Column(db.CHAR(10))
-    AnsD = db.Column(db.CHAR(10))
-    Answer = db.Column(db.CHAR(1))
+    ansA = db.Column(db.CHAR(10))
+    ansB = db.Column(db.CHAR(10))
+    ansC = db.Column(db.CHAR(10))
+    ansD = db.Column(db.CHAR(10))
+    answer = db.Column(db.CHAR(10))
 
-    def __init__(self, Qid, AnsA , AnsB, AnsC,AnsD ):
-        self.Qid = Qid
-        self.AnsA  = AnsA 
-        self.AnsB = AnsB
-        self.AnsC  = AnsC 
-        self.AnsD  = AnsD 
+    def __init__(self, qId, question, ansA , ansB, ansC,ansD ,answer):
+        self.qId = qId
+        self.question = question
+        self.ansA  = ansA 
+        self.ansB = ansB
+        self.ansC  = ansC 
+        self.ansD  = ansD 
+        self.answer  = answer
     def __repr__(self):
-        return f'Corpus(id={self.id},AnsA={self.AnsA},AnsB={self.AnsB},AnsC={self.AnsC},AnsD={self.AnsD},Answer={self.Answer})'
+        return f'newQs(id={self.id},ansA={self.ansA},ansB={self.ansB},ansC={self.ansC},ansD={self.ansD},answer={self.answer},question={self.question})'
 
 
         
     @property
     def json(self):
         return {
-            'Qid' : self.Qid,
+            'qId' : self.qId,
             'question' : self.question,
-            'AnsA' : self.AnsA,
-            'AnsB' : self.AnsB,
-            'AnsC' : self.AnsC,
-            'AnsD' : self.AnsD,
-            'Answer' : self.Answer,
+            'ansA' : self.ansA,
+            'ansB' : self.ansB,
+            'ansC' : self.ansC,
+            'ansD' : self.ansD,
+            'answer' : self.answer
         
         }
-
     def save(self):
         db.session.add(self)
         db.session.commit()
@@ -44,3 +43,4 @@ class  NewQDto(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+        

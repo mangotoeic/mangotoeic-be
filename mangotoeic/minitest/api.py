@@ -10,12 +10,12 @@ class Minitest(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id',type = int, required = False, help = 'This field cannot be left blank')
         parser.add_argument('user_id',type = str, required = False, help = 'This field cannot be left blank')
-        parser.add_argument('Qid',type = int, required = False, help = 'This field cannot be left blank') 
+        parser.add_argument('qId',type = int, required = False, help = 'This field cannot be left blank') 
         parser.add_argument('answer',type = str, required = False, help = 'This field cannot be left blank')
 
     def post(self):
         data = self.parser.parse_args()
-        minitest = MinitestDto(data['Qid'], data['answer'])
+        minitest = MinitestDto(data['qId'], data['answer'])
         try:
             minitest.save()
         except:
@@ -32,7 +32,7 @@ class Minitest(Resource):
         data = Minitest.parser.parse_args()
         minitest = MinitestDao.find_by_id(id)
 
-        minitest.Qid = data['Qid']
+        minitest.qId = data['qId']
         minitest.answer = data['answer']
         minitest.save()
         return minitest.json
