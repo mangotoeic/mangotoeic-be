@@ -3,6 +3,7 @@ from mangotoeic.user.dto import UserDto
 from mangotoeic.ext.db import Base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.mysql import DECIMAL, VARCHAR, LONGTEXT
+
 import pandas as pd
 
 
