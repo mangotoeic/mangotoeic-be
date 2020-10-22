@@ -19,8 +19,8 @@ class MinitestDao():
         return cls.query.all()
 
     @classmethod 
-    def find_by_Qid(cls,Qid):
-        return cls.query.filter_by(Qid==Qid).all()
+    def find_by_qId(cls,qId):
+        return cls.query.filter_by(qId==qId).all()
 
     @classmethod
     def find_by_id(cls,id):
@@ -36,10 +36,10 @@ class MinitestDao():
         Base.metadata.create_all(engine)   # 처음 테일블만들때 제외하고는 주석처리
         Session = sessionmaker(bind=engine)
         session = Session()
-        session.add(MinitestDto(Qid = 1, answer='AA'))
-        session.add(MinitestDto(Qid = 2, answer='B'))
-        session.add(MinitestDto(Qid = 3, answer='C'))
-        session.add(MinitestDto(Qid = 5, answer='F'))
+        session.add(MinitestDto(qId = 1, answer='AA'))
+        session.add(MinitestDto(qId = 2, answer='B'))
+        session.add(MinitestDto(qId = 3, answer='C'))
+        session.add(MinitestDto(qId = 5, answer='F'))
         session.commit()
         
 mt = MinitestDao() 

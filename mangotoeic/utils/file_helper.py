@@ -29,13 +29,16 @@ class FileReader:
 
     def csv_to_dframe(self) -> object:
         return pd.read_csv(self.new_file(), encoding='UTF-8', thousands=',')
-
-    def xls_to_dframe(self, header, usecols) -> object:
+    def csv_to_dframe_bypath(self,fpath) -> object:
+        return pd.read_csv(fpath, encoding='UTF-8', thousands=',')
+    def xls_to_dframe(self, header=0, usecols=None) -> object:
         print(f'PANDAS VERSION: {pd.__version__}')
         return pd.read_excel(self.new_file(), header = header, usecols = usecols)
-
-    def create_gmaps(self):
-        return googlemaps.Client(key='')
+    def xls_to_dframe_bypath(self, fpath,header=0, usecols=None) -> object:
+        print(f'PANDAS VERSION: {pd.__version__}')
+        return pd.read_excel(fpath, header = header, usecols = usecols)
+    # def create_gmaps(self):
+    #     return googlemaps.Client(key='')
 
     def json_load(self):
         return json.load(open(self.new_file(), encoding='UTF-8'))

@@ -9,22 +9,22 @@ class OdapDto(db.Model):
 
     id: int = db.Column(db.Integer, primary_key=True, index=True)
     #userid: int = db.Column(db.Integer, db.ForeignKey(UserDto.user_id))
-    Qid: int = db.Column(db.Integer) # db.ForeignKey(MinitestDto.Qid)
+    qId: int = db.Column(db.Integer) # db.ForeignKey(MinitestDto.qId)
     userid: int = db.Column(db.Integer)
 
-    def __init__(self, userid, Qid):
+    def __init__(self, userid, qId):
         self.userid = userid
-        self.Qid = Qid
+        self.qId = qId
     
     def __repr__(self):
-        return f'id={self.id}, Qid={self.Qid}'
+        return f'id={self.id}, qId={self.qId}'
 
     @property
     def json(self):
         return {
             'id' : self.id,
             'userid' : self.userid,
-            'Qid' : self.Qid
+            'qId' : self.qId
         }
     
     def save(self):
