@@ -10,4 +10,4 @@ def initialize_routes(api):
     api.add_resource(User, '/api/user/<string:id>')
     api.add_resource(Users, '/api/users')
     # api.add_resource(Article, '/api/article/<string:id>')
-    # api.add_resource(Articles, '/api/articles/')
+    # api.add_resource(Articles, '/api/articles/')l

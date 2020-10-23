@@ -31,16 +31,7 @@ class MinitestDao():
     #     return cls.query.filter_by(user_id==user_id).first()
 
 
-    def to_sql(self):
-        engine = create_engine('mysql+mysqlconnector://root:root@127.0.0.1/mariadb?charset=utf8', encoding='utf8', echo=True)
-        Base.metadata.create_all(engine)   # 처음 테일블만들때 제외하고는 주석처리
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        session.add(MinitestDto(qId = 1, answer='AA'))
-        session.add(MinitestDto(qId = 2, answer='B'))
-        session.add(MinitestDto(qId = 3, answer='C'))
-        session.add(MinitestDto(qId = 5, answer='F'))
-        session.commit()
+
         
 mt = MinitestDao() 
 mt.to_sql()
