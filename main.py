@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_restful import Api
 from flask_cors import CORS
 from mangotoeic.ext.db import url, db
@@ -11,25 +11,29 @@ from mangotoeic.recommendation.api import Recommendation, Recommendations
 from mangotoeic.reviewboard.api import Review, Reviews
 from mangotoeic.odap.api import Odap, Odaps
 from mangotoeic.vocab.api import Vocab, Vocabs
+from mangotoeic.user.dto import UserDto
+from mangotoeic.user import user
+from mangotoeic.ext.routes import initialize_routes
 
-
+print('========== 1 ==========')
 app = Flask(__name__)
 CORS(app)
-print('========== url ==========')
+app.register_blueprint(user)
+
 print(url)
 app.config['SQLALCHEMY_DATABASE_URI'] = url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 api = Api(app)
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
+# @app.before_first_request
+# def create_tables():
+#     db.create_all()
 
 initialize_routes(api)
 
-with app.app_context():
-    db.create_all()
+# with app.app_context():
+#     db.create_all()
 
 
 @app.route('/api/test')
@@ -116,3 +120,11 @@ def test():
         "question": "Workers are advised not to operate certain machines by ___ ."
     }
 }
+
+# @app.route('/api/test2', methods=['POST'])
+# def registerUser():
+#     data = request.data
+#     user_name = data['user_name']
+#     password = data['password']
+#     email = data['email']
+#     return data

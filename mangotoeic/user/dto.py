@@ -12,12 +12,14 @@ class UserDto(db.Model):
     __table_args__={'mysql_collate':'utf8_general_ci'}
 
     user_id = db.Column(db.Integer, primary_key=True, index=False)
-    user_name = db.Column(db.VARCHAR(20))
-    # password = Column(VARCHAR(20))
+    user_name = db.Column(db.String(20))
+    password = db.Column(db.String(20))
     qId = db.Column(db.Integer)
     user_answer = db.Column(db.Integer)
     answered_correctly = db.Column(db.Float)
     prior_question_elapsed_time = db.Column(db.Float)
+    email = db.Column(db.String(20))
+    confirmPassword = db.Column(db.String(20))
 
     # def __repr__(self):
     #     return f'id={self.user_id}, userid={self.user_name} password={self.password}, qId={qId}'
@@ -36,8 +38,8 @@ class UserDto(db.Model):
     def json(self):
         return {
             'user_id' : self.user_id,
-            # 'user_name' : self.user_name,
-            # 'password' : self.password,
+            'user_name' : self.user_name,
+            'password' : self.password,
             'qId' : self.qId,
             'user_answer' : self.user_answer,
             'answered_correctly': self.answered_correctly,
@@ -45,7 +47,6 @@ class UserDto(db.Model):
         }
         
         
-
     def save(self):
         db.session.add(self)
         db.session.commit()
@@ -53,3 +54,8 @@ class UserDto(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+
+
+class UserVo:
+    password: str = ''
+    email: str = ''
