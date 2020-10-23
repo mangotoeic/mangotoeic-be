@@ -5,6 +5,8 @@ from mangotoeic.review.api import Review,Reviews
 from mangotoeic.home.api import Home
 
 def initialize_routes(api):
+    
+    print('===============2=================')
     api.add_resource(Home, '/api')
     # api.add_resource(Item, '/api/item/<string:id>')
     # api.add_resource(Items,'/api/items')

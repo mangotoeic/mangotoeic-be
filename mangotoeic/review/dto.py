@@ -8,6 +8,7 @@ class ReviewDto(db.Model):
     id: int = db.Column(db.Integer, primary_key=True, index=True)
     user_id : int = db.Column(db.Integer) 
     # , db.ForeignKey(UserDto.user_id)
+    # user_name : str = db.Column(db.String(20))
     review: str = db.Column(db.String(500))
     star: int = db.Column(db.Integer)
     label: int = db.Column(db.Integer)

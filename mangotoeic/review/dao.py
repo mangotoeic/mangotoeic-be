@@ -2,14 +2,16 @@ from mangotoeic.ext.db import db, openSession
 from mangotoeic.review.tokenizer import Prepro
 from mangotoeic.review.dto import ReviewDto 
 from mangotoeic.user.dto import UserDto
-import pandas
+import pandas as pd
 import json
 
 class ReviewDao(ReviewDto):
     
     @classmethod
     def find_all(cls):
-        return cls.query.all()
+        sql = cls.query
+        df = pd.read_sql(sql.statement, sql.session.bind)
+        return json.loads(df.to_json(orient = 'records'))
 
     @classmethod 
     def find_by_user_id(cls,user_id):
