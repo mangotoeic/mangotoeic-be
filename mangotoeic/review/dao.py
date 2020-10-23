@@ -1,16 +1,9 @@
-
-from mangotoeic.reviewboard.dto import ReviewDto 
-import os
-import sys
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-basedir = os.path.dirname(os.path.abspath(__file__))
-from mangotoeic.utils.file_helper import FileReader
-import pandas as pd 
-
-from mangotoeic.ext.db import Base,db
-from sqlalchemy import Column, Integer, String, ForeignKey,create_engine
-from sqlalchemy.orm import sessionmaker  
+from mangotoeic.ext.db import db, openSession
+from mangotoeic.review.tokenizer import Prepro
+from mangotoeic.review.dto import ReviewDto 
+from mangotoeic.user.dto import UserDto
  
+
 
 
 class ReviewDao():
@@ -20,8 +13,8 @@ class ReviewDao():
         return cls.query.all()
 
     @classmethod 
-    def find_by_name(cls,name):
-        return cls.query.filter_by(name==name).all()
+    def find_by_user_id(cls,user_id):
+        return cls.query.filter_by(user_id==user_id).all()
 
     @classmethod
     def find_by_id(cls,id):
@@ -35,6 +28,33 @@ class ReviewDao():
     def find_by_label(cls,label):
         return cls.query.filter_by(label==label).first()
     
+    @staticmethod
+    def save(review):
+        db.session.add(review)
+        db.session.commit()
+         
+    @staticmethod
+    def insert_many():
+        service = Prepro()
+        Session = openSession()
+        session = Session()
+        df = service.get_data()
+        print(df.head())
+        session.bulk_insert_mappings(ReviewDto, df.to_dict(orient = 'records'))
+        session.commit()
+        session.close()
+        print('done')
+
+    @classmethod
+    def delete_review(cls,id):
+        data = cls.query.get(id)
+        db.session.delete(data)
+        db.session.commit()
+
+rd = ReviewDao()
+rd.insert_many()
+
+     
     # @classmethod
     # def add_review(cls, user_id,review, star, label):
     #     add_review = cls.query.filter(user_id == user_id, review == review, star==star, label==label).add(review,star,label)
