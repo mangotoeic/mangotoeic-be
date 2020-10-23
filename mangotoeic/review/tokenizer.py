@@ -77,9 +77,10 @@ class Prepro():
         review_data = reader.csv_to_dframe()
 
         review_data['user_id'] = ''
-        review_data = review_data[ ['user_id'] + [ col for col in review_data.columns if col != 'user_id' ] ]
+        review_data['user_id'] = 999
         
-        return review_data.iloc[10409:12400,:]
+        review_data = review_data[ ['user_id'] + [ col for col in review_data.columns if col != 'user_id' ] ]
+        return review_data.iloc[10409:10500,:]
 
 
     @staticmethod
@@ -142,7 +143,7 @@ class Prepro():
         seq.add(Dense(6, activation='softmax'))
         seq.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
         run = seq.fit(X_train, y_train, epochs=4, batch_size=10, validation_split=0.1)
-        seq.save("review_star_model")
+        # seq.save("review_star_model")
         print('테스트 정확도 : {:.2f}%'.format(seq.evaluate(X_test,y_test)[1]*100))
 
         return seq.evaluate(X_test,y_test)
@@ -157,6 +158,7 @@ class Prepro():
 
 # Tk = Prepro()
 # Tk.hook_process() 
+
 # review = '이 앱은 정말 너무 좋은 앱입니다. 제 마음을 훔쳐갔어요'
 # review = Prepro.tokenize(review, Tk.get_stopwords())
 # review = Prepro.encoding(review)

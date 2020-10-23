@@ -6,13 +6,14 @@ class ReviewDto(db.Model):
     __table_args__ = {'mysql_collate':'utf8_general_ci'}
 
     id: int = db.Column(db.Integer, primary_key=True, index=True)
-    user_id : str = db.Column(db.VARCHAR(10))
+    user_id : int = db.Column(db.Integer) 
+    # , db.ForeignKey(UserDto.user_id)
     review: str = db.Column(db.String(500))
     star: int = db.Column(db.Integer)
     label: int = db.Column(db.Integer)
   
     
-    def __init__(self,  review, star, label):
+    def __init__(self, user_id, review, star, label):
         self.user_id = user_id
         self.review = review
         self.star = star
@@ -31,13 +32,11 @@ class ReviewDto(db.Model):
             'star' : self.star,
             'label' : self.label
         }
-    
-    # def save(self):
-    #     db.session.add(self)
-    #     db.session.commit()
 
-    # def delete(self):
-    #     db.session.delete(self)
-    #     db.session.commit()
+class ReviewVo:
+    id: int = 1
+    user_id : int = 0 
+    review: str = ''
+    star: int = 0
+    label: int = 0
     
-     

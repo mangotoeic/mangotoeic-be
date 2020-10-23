@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "/home/bigdeal/anaconda3/envs/big/bin/python",
+    "python.pythonPath": "C:\\Users\\jongm\\anaconda3\\envs\\tensorflow\\python.exe",
     "python.dataScience.jupyterServerURI": "local"
 }
