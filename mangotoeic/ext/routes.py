@@ -13,4 +13,4 @@ def initialize_routes(api):
     api.add_resource(Review, '/api/review/<string:id>')
     api.add_resource(Reviews, '/api/reviews/')
     # api.add_resource(Article, '/api/article/<string:id>')
-    # api.add_resource(Articles, '/api/articles/')
+    # api.add_resource(Articles, '/api/articles/')l
