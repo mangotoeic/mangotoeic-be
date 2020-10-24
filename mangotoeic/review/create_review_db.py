@@ -5,7 +5,7 @@ basedir = os.path.dirname(os.path.abspath(__file__))
 from mangotoeic.utils.file_helper import FileReader
 import pandas as pd 
 
-from mangotoeic.user.user_dto import UserDto
+from mangotoeic.user.dto import UserDto
 from mangotoeic.ext.db import Base
 from sqlalchemy import Column, Integer, String, ForeignKey,create_engine
 from sqlalchemy.orm import sessionmaker

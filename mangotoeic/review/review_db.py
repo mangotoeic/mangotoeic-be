@@ -51,6 +51,8 @@ class Review(Base):
             print(i)
             
         session.commit()
+if __name__ == '__main__':
 
-review = Review()
-review.to_sql()
+    
+    review = Review()
+    review.to_sql()

@@ -12,7 +12,7 @@ class ReviewDto(db.Model):
     label: int = db.Column(db.Integer)
   
     
-    def __init__(self,  review, star, label):
+    def __init__(self, user_id, review, star, label):
         self.user_id = user_id
         self.review = review
         self.star = star
