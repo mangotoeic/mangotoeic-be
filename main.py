@@ -1,24 +1,29 @@
+print('========== main ==========')
 from flask import Flask
 from flask_restful import Api
+print('========== db ==========')
 from mangotoeic.ext.db import url, db
+print('========== dbout ==========')
+print('========== home ==========')
 from mangotoeic.ext.routes import initialize_routes
+print('========== homeout ==========')
 from mangotoeic.user.api import User, Users
-from mangotoeic.corpus.api import Corpus, Corpuses
-from mangotoeic.legacy.api import Legacy, Legacyes
-from mangotoeic.newq.api import NewQ, NewQs
-from mangotoeic.recommendation.api import Recommendation, Recommendations
-from mangotoeic.review.api import Review, Reviews
+
 from mangotoeic.odap.api import Odap, Odaps
 from mangotoeic.vocab.api import Vocab, Vocabs
 from mangotoeic.review import review
+from mangotoeic.legacy import legacy
 from flask_cors import CORS
+from mangotoeic.review.api import Review, Reviews
 
 
 app = Flask(__name__)
 CORS(app)
 print('========== url ==========')
 print(url)
-app.register_blueprint(review)
+# app.register_blueprint(review)
+app.register_blueprint(legacy)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
@@ -37,3 +42,4 @@ with app.app_context():
 @app.route('/api/test')
 def test():
     return {'test':'SUCCESS'}
+print('========== url2 ==========' )
