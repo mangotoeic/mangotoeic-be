@@ -12,8 +12,8 @@ parser.add_argument('vocabId', type=int, required=True,
                                         help='This field should be a vocabId')
 parser.add_argument('vocab', type=str, required=True,
                                         help='This field should be a vocab')
-parser.add_argument('qId', type=int, required=True,
-                                        help='This field should be a qId')
+parser.add_argument('correctAvg', type=float, required=True,
+                                        help='This field should be a correctAvg')
 
 def Vocab(Resrouce):
     @staticmethod
