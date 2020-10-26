@@ -3,6 +3,7 @@ from mangotoeic.user.api import User, Users
 from mangotoeic.review.api import Review,Reviews
 # from mangotoeic.article.api import Article, Articles
 from mangotoeic.home.api import Home
+import logging
 
 def initialize_routes(api):
     
@@ -16,3 +17,8 @@ def initialize_routes(api):
     api.add_resource(Reviews, '/api/reviews/')
     # api.add_resource(Article, '/api/article/<string:id>')
     # api.add_resource(Articles, '/api/articles/')
+
+@article.errorhandler(500)
+def article_api_error(e):
+    logging.exception('An error occured during article request. %s' % str(e))
+    return 'An internal error occurred.', 500

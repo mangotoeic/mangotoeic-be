@@ -7,22 +7,19 @@ class ReviewDto(db.Model):
 
     id: int = db.Column(db.Integer, primary_key=True, index=True)
     user_id : int = db.Column(db.Integer) 
-    # , db.ForeignKey(UserDto.user_id)
-    # user_name : str = db.Column(db.String(20))
+    # , db.ForeignKey(UserDto.user_id) 
     review: str = db.Column(db.String(500))
-    star: int = db.Column(db.Integer)
-    label: int = db.Column(db.Integer)
+    star: int = db.Column(db.Integer) 
   
     
     def __init__(self, user_id, review, star, label):
         self.user_id = user_id
         self.review = review
-        self.star = star
-        self.label = label
+        self.star = star 
     
 
     def __repr__(self):
-        return f'Review(id=\'{self.id}\',user_id=\'{self.user_id}\',review=\'{self.review}\', star=\'{self.star}\',label=\'{self.label}\',)'
+        return f'Review(id=\'{self.id}\',user_id=\'{self.user_id}\',review=\'{self.review}\', star=\'{self.star}\',)'
 
     @property
     def json(self):
@@ -30,14 +27,12 @@ class ReviewDto(db.Model):
             'id' : self.id,
             'user_id' : self.user_id,
             'review' : self.review,
-            'star' : self.star,
-            'label' : self.label
+            'star' : self.star
         }
 
 class ReviewVo:
     id: int = 1
     user_id : int = 0 
     review: str = ''
-    star: int = 0
-    label: int = 0
+    star: int = 0 
     

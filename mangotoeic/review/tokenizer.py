@@ -16,7 +16,7 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing import sequence 
 
 from keras.models import Sequential 
-from keras.layers import Dense, LSTM, Embedding
+from keras.layers import Dense, LSTM, Embedding, SimpleRNN
 from keras.utils import np_utils
  
 # from konlpy.tag import Kkma 시간 오래걸려
@@ -50,10 +50,9 @@ class Prepro():
         X = padded
         y = Prepro.one_hot_encoding(y)
         X_train, X_test, y_train, y_test = Prepro.split(X,y)
-        print(X_test)
-        print(y_test)
-
+ 
         Prepro.accuracy_by_keras_LSTM(X_train, X_test, y_train, y_test, vocab_size_for_embedding = vocabs)
+        Prepro.accuracy_by_keras_RNN(X_train, X_test, y_train, y_test, vocab_size_for_embedding = vocabs)
 
     
         
@@ -80,7 +79,7 @@ class Prepro():
         review_data['user_id'] = 999
         
         review_data = review_data[ ['user_id'] + [ col for col in review_data.columns if col != 'user_id' ] ]
-        return review_data.iloc[10409:10500,:]
+        return review_data.iloc[1:46275,:]
 
 
     @staticmethod
@@ -110,7 +109,9 @@ class Prepro():
         tokenizer.fit_on_texts(tokenlist)
         return tokenizer.texts_to_sequences(tokenlist)
 
-    
+    @staticmethod
+    def one_hot_encoding(col):
+        return np_utils.to_categorical(col)    
 
     @staticmethod
     def zeropadding(encodedlist):
@@ -138,31 +139,41 @@ class Prepro():
     @staticmethod
     def accuracy_by_keras_LSTM(X_train,X_test,y_train,y_test,vocab_size_for_embedding):
         seq = Sequential()
-        seq.add(Embedding(vocab_size_for_embedding+1,100))
-        seq.add(LSTM(150))
+        seq.add(Embedding(vocab_size_for_embedding+1,150))
+        seq.add(LSTM(150,activation='tanh'))
         seq.add(Dense(6, activation='softmax'))
         seq.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
         run = seq.fit(X_train, y_train, epochs=4, batch_size=10, validation_split=0.1)
-        # seq.save("review_star_model")
+        # seq.save("lstm_review_star_model")
         print('테스트 정확도 : {:.2f}%'.format(seq.evaluate(X_test,y_test)[1]*100))
 
         return seq.evaluate(X_test,y_test)
- 
+    
+
     @staticmethod
-    def one_hot_encoding(col):
-        return np_utils.to_categorical(col)
+    def accuracy_by_keras_RNN(X_train,X_test,y_train,y_test,vocab_size_for_embedding):
+        seq = Sequential()
+        seq.add(Embedding(vocab_size_for_embedding+1, 150))
+        seq.add(SimpleRNN(32))
+        seq.add(Dense(6, activation='softmax'))
+        seq.compile(optimizer='adam',loss='categorical_crossentropy',metrics=['acc'])
+        run = seq.fit(X_train, y_train, epochs=4, batch_size=10, validation_split=0.1)
+        # seq.save("RNN_review_star_model")
+        print('테스트 정확도 : {:.2f}%'.format(seq.evaluate(X_test,y_test)[1]*100))
+
+        return seq.evaluate(X_test,y_test)
+    
+    
     
 
 
-
-
-# Tk = Prepro()
-# Tk.hook_process() 
+Tk = Prepro()
+Tk.hook_process() 
 
 # review = '이 앱은 정말 너무 좋은 앱입니다. 제 마음을 훔쳐갔어요'
 # review = Prepro.tokenize(review, Tk.get_stopwords())
 # review = Prepro.encoding(review)
 # review = Prepro.zeropadding(review)
-# model = keras.models.load_model('review_star_model')
-# score = model.predict(review)
+# lstmmodel = keras.models.load_model('review_star_model')
+# score = lstmmodel.predict(review)
 # print(score)

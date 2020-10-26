@@ -9,9 +9,7 @@ class ReviewDao(ReviewDto):
     
     @classmethod
     def find_all(cls):
-        sql = cls.query
-        df = pd.read_sql(sql.statement, sql.session.bind)
-        return json.loads(df.to_json(orient = 'records'))
+        return cls.query.all()
 
     @classmethod 
     def find_by_user_id(cls,user_id):
@@ -25,14 +23,17 @@ class ReviewDao(ReviewDto):
     def find_by_star(cls,star):
         return cls.query.filter_by(star==star).first()
 
-    @classmethod
-    def find_by_label(cls,label):
-        return cls.query.filter_by(label==label).first()
-    
     @staticmethod
     def save(review):
-        db.session.add(review)
-        db.session.commit()
+        print(review)
+        Session = openSession()
+        session = Session()
+        """"asasdasdasddddddddddnklkladskdsklndsnklsadnkdsnjsk"""
+        """"asasdasdasddddddddddnklkladskdsklndsnklsadnkdsnjsk"""
+        """"asasdasdasddddddddddnklkladskdsklndsnklsadnkdsnjsk"""
+        """"asasdasdasddddddddddnklkladskdsklndsnklsadnkdsnjsk"""
+        star
+        newReview = ReviewDto(id = review['id'], user_id = review['user_id'], review = review['review'], star )
          
     @staticmethod
     def insert_many():
