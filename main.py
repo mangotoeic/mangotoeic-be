@@ -9,10 +9,12 @@ from mangotoeic.ext.routes import initialize_routes
 print('========== homeout ==========')
 from mangotoeic.user.api import User, Users
 
-from mangotoeic.odap.api import Odap, Odaps
+from mangotoeic.odap.api import Odap
 from mangotoeic.vocab.api import Vocab, Vocabs
 from mangotoeic.review import review
 from mangotoeic.legacy import legacy
+from mangotoeic.vocab import vocab, vocabs
+
 from flask_cors import CORS
 from mangotoeic.review.api import Review, Reviews
 
@@ -23,6 +25,8 @@ print('========== url ==========')
 print(url)
 # app.register_blueprint(review)
 app.register_blueprint(legacy)
+app.register_blueprint(vocab)
+app.register_blueprint(vocabs)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

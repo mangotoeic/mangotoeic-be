@@ -3,6 +3,7 @@ from mangotoeic.user.api import User, Users
 from mangotoeic.review.api import Review,Reviews
 from mangotoeic.home.api import Home
 from mangotoeic.legacy.api import Legacy ,Legacies
+from mangotoeic.vocab.api import Vocab, Vocabs
 
 def initialize_routes(api):
     print('===============initialize===================')
@@ -13,4 +14,6 @@ def initialize_routes(api):
     api.add_resource(Reviews, '/api/reviews/')
     api.add_resource(Legacy, '/api/legacy')
     api.add_resource(Legacies, '/api/legacies')
+    # api.add_resource(Vocab, '/api/vocab/')
+    api.add_resource(Vocabs, '/api/vocabs/')
     

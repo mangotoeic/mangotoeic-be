@@ -15,7 +15,7 @@ parser.add_argument('vocab', type=str, required=True,
 parser.add_argument('correctAvg', type=float, required=True,
                                         help='This field should be a correctAvg')
 
-def Vocab(Resrouce):
+def Vocab(Resource):
     @staticmethod
     def post():
         args = parser.parse_args()
@@ -50,26 +50,11 @@ def Vocab(Resrouce):
         print(f'Vocab {args["id"]} deleted')
         return {'code':0, 'message':'SUCCESS'}, 200
 
-class Auth(Resource):
+class Vocabs(Resource):
     def post(self):
-        body = request.get_json()
-        vocab = VocabDao(**body)
-        VocabDao.save(vocab)
-        id = vocab.vocabId
+        ud = VocabDao()
+        ud.insert_many('vocabs')
 
-        return {'id': str(id)}, 200 
-
-class Access(Resource):
-    def __init__(self):
-        print('========== 5 ==========')
-    
-    def post(self):
-        print('========== 6 ==========')
-        args = parser.parse_args()
-        vocab = VocabVo()
-        vocab.vocabId = args.vocabId
-        vocab.user_id = args.user_id
-        print(vocab.user_id)
-        print(vocab.vocabId)
-        data = VocabDao.login(vocab)
-        return data[0], 200
+    def get(self):
+        data = VocabDao.find_all()
+        return data, 200
