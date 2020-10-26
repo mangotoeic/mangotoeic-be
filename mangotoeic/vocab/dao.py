@@ -1,12 +1,24 @@
 from mangotoeic.ext.db import db, openSession
 from mangotoeic.vocab.dto import VocabDto
 from mangotoeic.vocab.pro import VocabPro
+import pandas as pd
+import json
 
-class VocabDao():
+class VocabDao(UserDto):
 
     @classmethod
     def find_all(cls):
-        return cls.query.all
+        sql = cls.query
+        df = pd.read_sql(sql.statement, sql.session.bind)
+        return json.loads(df.to_json(orient='records'))
+    
+    @classmethod
+    def find_by_vocab(cls, vocabId):
+        return cls.query.filter_by(vocabId == vocabId).all()
+    
+    @classmethod
+    def find_by_id(cls, userid):
+        return cls.query.filter_by(userid == userid).first()
     
     @classmethod
     def add_vocab(cls, userid, vocabId, newv):
@@ -28,7 +40,3 @@ class VocabDao():
     def delete_vocab(cls, userid, vocabId):
         del_vocab = cls.query.filter(userid == userid, vocabId == vocabId).delete(vocabId)
         return del_vocab
-
-if __name__ == "__main__":
-    dao = VocabDao()
-    dao.insert_many()

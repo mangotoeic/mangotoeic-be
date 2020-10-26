@@ -1,38 +1,60 @@
+import json
 from typing import List
+from flask import request, jsonify
 from flask_restful import Resource, reqparse
-from mangotoeic.odap.dto import OdapDto
+from mangotoeic.odap.dto import OdapDto, OdapVo
 from mangotoeic.odap.dao import OdapDao
 
+parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
+parser.add_argument('user_id', type=int, required=True,
+                                        help='This field should be a userid')
+parser.add_argument('qId', type=int, required=True,
+                                        help='This field should be a qId')
+
 def Odap(Resrouce):
+    @staticmethod    
+    def post(self):
+        args = parser.parse_args()
+        print(f'Wrong question {args["id"]} added')
+        params = json.loads(request.get_data(), encoding='utf-8')
+        if len(params) == 0:
+            return 'No parameter'
+        params_str = ''
+        for key in params.keys():
+            params_str += 'key: {}, value {}<br>'.format(key, params[key])
+        return {'code':0, 'message': 'SUCCESS'}, 200
+    
+    @staticmethod
+    def update():
+        args = parser.parse_args()
+        print(f'Question {args["id"]} updated')
+        return {'code':0, 'message':'SUCCESS'}, 200
+    
+    @staticmethod
+    def delete():
+        args = parser.parse_args()
+        print(f'Question {args["id"]} deleted')
+        return {'code':0, 'message':'SUCCESS'}, 200
+class Auth(Resource):
+    def post(self):
+        body = request.get_json()
+        odap = OdapDao(**body)
+        OdapDao.save(odap)
+        id = odap.qId
+
+        return {'id': str(id)}, 200 
+
+class Access(Resource):
     def __init__(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, required=False, help='This field cannot be left blank')
-        parser.add_argument('user_id', type=int, required=False, help='This field cannot be left blank')
-        parser.add_argument('qId', type=int, required=False, help='This field cannot be left blank')
+        print('========== 5 ==========')
     
     def post(self):
-        data = self.parser.parse_args()
-        odap = OdapDto(data['user_id'], data['qId'])
-        try:
-            odap.save()
-        except:
-            return {'message': 'An error occured inserting the question'}, 500
-        return odap.json(), 201
-    
-    def get(self, id):
-        odap = OdapDao.find_by_id(id)
-        if odap:
-            return odap.json()
-        return {'message': 'Question not found'}, 404
-    
-    def put(self, id):
-        data = Odap.parser.parse_args()
-        odap = OdapDao.find_by_id(id)
-
-        odap.qId = data['qId']
-        odap.save()
-        return odap.json()
-
-class Odaps(Resource):
-    def get(self):
-        return {'odaps': list(map(lambda odap: odap.json(), OdapDao.find_all()))}
+        print('========== 6 ==========')
+        args = parser.parse_args()
+        odap = OdapVo()
+        odap.qId = args.qId
+        odap.user_id = args.user_id
+        print(odap.user_id)
+        print(odap.qId)
+        data = OdapDao.login(odap)
+        return data[0], 200

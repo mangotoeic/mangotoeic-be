@@ -6,6 +6,7 @@ class VocabDto(db.Model):
 
     __tablename__ = 'vocab'
     __table_args__={'mysql_collate':'utf8_general_ci'}
+
     vocabId: int = db.Column(db.Integer, primary_key=True, index=True)
     vocab: str = db.Column(db.String(50))
     user_id: int = db.Column(db.Integer)
@@ -30,10 +31,8 @@ class VocabDto(db.Model):
             'correctAvg': self.correctAvg
         }
     
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
+class VocabVo:
+    user_id: int = 0
+    vocabId: int = 0
+    vocab: str = ''
+    correctAvg: float = 0.0
