@@ -4,7 +4,7 @@ from mangotoeic.vocab.pro import VocabPro
 import pandas as pd
 import json
 
-class VocabDao(UserDto):
+class VocabDao(VocabDto):
 
     @classmethod
     def find_all(cls):

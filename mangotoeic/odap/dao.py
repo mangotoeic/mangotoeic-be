@@ -4,7 +4,7 @@ from mangotoeic.odap.pro import OdapPro
 import pandas as pd
 import json
 
-class OdapDao():
+class OdapDao(OdapDto):
 
     @classmethod
     def find_all(cls):

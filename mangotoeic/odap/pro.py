@@ -1,6 +1,6 @@
 import pandas as pd
 
-class OdpaPro:
+class OdapPro:
     def __init__(self):
         self.fpath =''
     
@@ -17,5 +17,5 @@ class OdpaPro:
         return df
 
 if __name__ == '__main__':
-    prepro = OdpaPro()
+    prepro = OdapPro()
     prepro.hook()
