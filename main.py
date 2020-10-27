@@ -14,9 +14,11 @@ from mangotoeic.vocab.api import Vocab, Vocabs
 from mangotoeic.user.dto import UserDto
 from mangotoeic.user import user
 from mangotoeic.ext.routes import initialize_routes
+import json
 
 print('========== 1 ==========')
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
 CORS(app)
 app.register_blueprint(user)
 
@@ -120,6 +122,14 @@ def test():
         "question": "Workers are advised not to operate certain machines by ___ ."
     }
 }
+
+@app.route('/api/diagnosis')
+def diagnosis():
+    with open('./mangotoeic/minitest/data/diagnosis.json', 'r', encoding='utf-8') as json_file:
+        json_data = json.load(json_file)
+        json_file.close()
+    return json_data
+
 
 # @app.route('/api/test2', methods=['POST'])
 # def registerUser():

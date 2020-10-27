@@ -59,3 +59,12 @@ class UserDto(db.Model):
 class UserVo:
     password: str = ''
     email: str = ''
+    user_id : int = 0 
+    user_name : str = ''
+    password : str = ''
+    qId : int = 0 
+    user_answer : int = 0 
+    answered_correctly : float = 0
+    prior_question_elapsed_time : float = 0 
+    email : str = ''
+    confirmPassword : str = ''

@@ -7,8 +7,8 @@ import json
 from flask import jsonify
 
 parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
-parser.add_argument('userid', type=str, required=True,
-                                        help='This field should be a userid')
+parser.add_argument('email', type=str, required=True,
+                                        help='This field should be a email')
 parser.add_argument('password', type=str, required=True,
                                         help='This field should be a password')
 
@@ -65,9 +65,10 @@ class Auth(Resource):
         body = request.get_json()
         user = UserDto(**body)
         UserDao.save(user)
-        id = user.userid
+        email = user.email
+        # password = user.password
         
-        return {'id': str(id)}, 200 
+        return {'email': str(email)}, 200 
 
 
 class Access(Resource):
@@ -80,4 +81,4 @@ class Access(Resource):
         user.password = args.password
         user.email = args.email
         data = UserDao.login(user)
-        return data, 200
+        return data[0], 200

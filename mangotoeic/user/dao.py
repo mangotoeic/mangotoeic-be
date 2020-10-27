@@ -36,11 +36,11 @@ class UserDao(UserDto):
 
     @classmethod
     def login(cls, user):
+        print('=============== 7 ==================')
         sql = cls.query\
             .filter(cls.email.like(user.email))\
             .filter(cls.password.like(user.password))
         df = pd.read_sql(sql.statement, sql.session.bind)
-        print('==================================')
         print(json.loads(df.to_json(orient='records')))
         return json.loads(df.to_json(orient='records'))
             
