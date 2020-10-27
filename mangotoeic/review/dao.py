@@ -50,9 +50,11 @@ class ReviewDao():
         data = cls.query.get(id)
         db.session.delete(data)
         db.session.commit()
-
-rd = ReviewDao()
-rd.insert_many()
+if __name__ == '__main__':
+    
+    
+    rd = ReviewDao()
+    rd.insert_many()
 
      
     # @classmethod

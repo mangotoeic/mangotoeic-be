@@ -3,37 +3,21 @@ from flask_restful import Api
 from mangotoeic.ext.db import url, db
 from mangotoeic.ext.routes import initialize_routes
 from mangotoeic.user.api import User, Users
-from mangotoeic.corpus.api import Corpus, Corpuses
-from mangotoeic.legacy.api import Legacy, Legacyes
-from mangotoeic.newq.api import NewQ, NewQs
-from mangotoeic.recommendation.api import Recommendation, Recommendations
-from mangotoeic.review.api import Review, Reviews
 from mangotoeic.odap.api import Odap, Odaps
-from mangotoeic.vocab.api import Vocab, Vocabs
-from mangotoeic.review import review
+from mangotoeic.resource.legacy import LegacyDao 
 from flask_cors import CORS
-
-
+from mangotoeic.review.api import Review, Reviews
 app = Flask(__name__)
-CORS(app)
-print('========== url ==========')
+CORS(app, resources={r'/api/*': {"origins": "*"}})
 print(url)
-app.register_blueprint(review)
 app.config['SQLALCHEMY_DATABASE_URI'] = url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 api = Api(app)
-
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
-initialize_routes(api)
-
 with app.app_context():
     db.create_all()
-
-
-@app.route('/api/test')
-def test():
-    return {'test':'SUCCESS'}
+    legacy_count = LegacyDao.count()
+    print(f'***** Users Total Count is {legacy_count} *****')
+    if legacy_count[0] == 0:
+        LegacyDao.bulk()
+initialize_routes(api)
