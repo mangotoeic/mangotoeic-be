@@ -115,6 +115,8 @@ class LegacyDao(LegacyDto):
         db.session.commit()
     @staticmethod
     def count():
+        Session = openSession()
+        session = Session()
         return session.query(func.count(LegacyDto.qId)).one()
 
 class Legacy(Resource):
