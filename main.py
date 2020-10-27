@@ -1,20 +1,25 @@
 from flask import Flask, request
+print('========== main ==========')
+from flask import Flask
 from flask_restful import Api
-from flask_cors import CORS
+print('========== db ==========')
 from mangotoeic.ext.db import url, db
+print('========== dbout ==========')
+print('========== home ==========')
 from mangotoeic.ext.routes import initialize_routes
+print('========== homeout ==========')
 from mangotoeic.user.api import User, Users
-from mangotoeic.corpus.api import Corpus, Corpuses
-from mangotoeic.legacy.api import Legacy, Legacyes
-from mangotoeic.newq.api import NewQ, NewQs
-from mangotoeic.recommendation.api import Recommendation, Recommendations
-from mangotoeic.reviewboard.api import Review, Reviews
-from mangotoeic.odap.api import Odap, Odaps
+
+from mangotoeic.odap.api import Odap
 from mangotoeic.vocab.api import Vocab, Vocabs
 from mangotoeic.user.dto import UserDto
 from mangotoeic.user import user
-from mangotoeic.ext.routes import initialize_routes
 import json
+from mangotoeic.review import review
+from mangotoeic.legacy import legacy
+from mangotoeic.vocab import vocab, vocabs
+from flask_cors import CORS
+from mangotoeic.review.api import Review, Reviews
 
 print('========== 1 ==========')
 app = Flask(__name__)
@@ -23,6 +28,11 @@ CORS(app)
 app.register_blueprint(user)
 
 print(url)
+# app.register_blueprint(review)
+app.register_blueprint(legacy)
+app.register_blueprint(vocab)
+app.register_blueprint(vocabs)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
@@ -129,12 +139,5 @@ def diagnosis():
         json_data = json.load(json_file)
         json_file.close()
     return json_data
+print('========== url2 ==========' )
 
-
-# @app.route('/api/test2', methods=['POST'])
-# def registerUser():
-#     data = request.data
-#     user_name = data['user_name']
-#     password = data['password']
-#     email = data['email']
-#     return data
