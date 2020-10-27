@@ -1,10 +1,16 @@
 from mangotoeic.ext.db import db
+from mangotoeic.odap.dto import OdapDto
+from mangotoeic.odap.pro import OdapPro
+import pandas as pd
+import json
 
-class OdapDao():
+class OdapDao(OdapDto):
 
     @classmethod
     def find_all(cls):
-        return cls.query.all
+        sql = cls.query
+        df = pd.read_sql(sql.statement, sql.session.bind)
+        return json.loads(df.to_json(orient='records'))
     
     @classmethod
     def add_odap(cls, userid, qId, newq):

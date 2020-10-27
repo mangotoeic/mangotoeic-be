@@ -1,3 +1,4 @@
+print('==============================legacy dto =============================')
 from mangotoeic.ext.db import db
 from mangotoeic.legacy.pro import LegacyPro
 from sqlalchemy.orm import Session, sessionmaker
@@ -40,14 +41,16 @@ class  LegacyDto(db.Model):
             'answer' : self.answer
         
         }
+class LegacyVo:
+    qId:int = 0
+    question:str ="" 
+    ansA :str = "" 
+    ansB :str = ""
+    ansC :str = ""
+    ansD :str = ""
+    answer:str  = ""
+        
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
 
 if __name__ == '__main__':
     config = {
