@@ -24,7 +24,7 @@ def initialize_routes(api):
     api.add_resource(Legacy, '/api/legacy')
     api.add_resource(Legacies, '/api/legacies')
     
-@Legacy.errorhandler(500)
+@legacy.errorhandler(500)
 def legacy_api_error(e):
     logging.exception('An error occurred during home request. %s' % str(e))
     return 'An internal error occurred.', 500
