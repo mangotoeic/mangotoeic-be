@@ -2,91 +2,74 @@ from typing import List
 from flask import request
 from flask_restful import Resource, reqparse
 from mangotoeic.review.dao import ReviewDao
+from mangotoeic.review.fromweb import WebCrawler
+from mangotoeic.review.model import Prepro
 from mangotoeic.review.dto import ReviewDto, ReviewVo
 import json
+import pandas as pd
+from mangotoeic.ext.db import engine
 from flask import jsonify
+import keras
+import numpy as np
 
 parser = reqparse.RequestParser()
-parser.add_argument('user_id', type = int, required = True, help = 'This field should be user_id')
-parser.add_argument('review', type = str, required = True, help = 'This field should be user_id')
+parser.add_argument('email', type = str, required = True, help = 'This field should be email, cannot be left blank')
+parser.add_argument('review', type = str, required = True, help = 'This field should be review, cannot be left blank') 
 
 class Review(Resource):
-    def __init__(self):
-        print('===============55=================')
 
     @staticmethod
-    def post(id):
-        args = parser.parse_args()
-        print(f'Review {args["id"]} added')
-        params = json.loads(request.get_data(), encoding = 'utf-8')
-        if len(params) ==0 :
-            return 'No parameter'
+    def post():
+        args = parser.parse_args() 
+        review_vo = ReviewVo()    
+        review_vo.email = args.email
+        review_vo.email = args.review
 
-        params_str = ''
-        for key in params.keys():
-            params_str += 'key: {}, value {}<br>'.format(key, params[key])
-        return {'code':0, 'message': 'SUCCESS'}, 200  
+        reviewtext = WebCrawler.strip_emoji(args.review)
+        reviewtext = WebCrawler.cleanse(reviewtext)
+        reviewtext = Prepro.tokenize(reviewtext, Prepro.get_stopwords())
+        reviewtext = Prepro.encoding(reviewtext)
+        reviewtext = Prepro.zeropadding(reviewtext)
+
+
+        rnnmodel = keras.models.load_model('RNN_review_star_model')
+        predictions = rnnmodel.predict(reviewtext)
+        star = np.argmax(predictions[0])
+
+        print(f'예측 별점은 {star}입니다')
+        
+        return {'star':int(star)}, 200 
     
-    @staticmethod
-    def get(id):
-        print(f'Review {id} gets called')
-        try: 
-            review = ReviewDao.find_by_id(id)
-            if review:
-                return review.json()
-        except Exception as e:
-            return {'message': 'User not found'}, 404 
+    def get(self,id):
+        review = ReviewDao.find_by_id(id)
+        if review:
+            return review.json()
+        return {'message': 'review not found'}, 404 
 
-    @staticmethod
-    def update(id):
-        args = parser.parse_args()
-        print(f'Review {args["id"]} updated')
-        return {'code':0, 'message': 'SUCCESS'}, 200
-    
-    @staticmethod
-    def delete(id):
-        args = parser.parse_args()
-        print(f'User {args["id"]} deleted')
-        return {'code':0, 'message': 'SUCCESS'}, 200 
+
+    def put(self, id):
+        data = Review.parser.parse_args()
+        searched = ReviewDao.find_by_id(id)
+
+        searched.email = searched['email']
+        searched.review = searched['review']      
+        searched.star = searched['star']
+        searched.save()
+        return searched.json()
 
 class Reviews(Resource): 
 
-    def post(self):
-        rd = ReviewDao()
-        rd.insert_many('reviews')
-        
-        print('===============6=========================')
-
     def get(self):
-        print('reviews gettttttttttt')
-        data = ReviewDao.find_all()
-        return data, 200
+        df = pd.read_sql_table('reviews', engine.connect())
+        return json.loads(df.to_json(orient = 'records'))
 
 
+        # return {'reviews': list(map(lambda review: review.json(), ReviewDao.find_all()))}
+  
+    # def post(self):
+    #     rd = ReviewDao()
+    #     rd.insert_many('reviews')
+        
+    #     print('===============6=========================')
 
-
-
-
-
-# class Auth(Resource):
-
-#     def post(self):
-#         body = request.get_json()
-#         review = ReviewDto(**body)
-#         ReviewDao.save(review)
-#         id = review.id
-#         return {'id': str(id)}, 200
-
-# class Access(Resource):
     
-#     def __init__(self):
-#         print('===============5=================')
-
-#     def post(self):
-        
-#         print('===============6=========================')
-#         args = parser.parse_args()
-#         review = ReviewVo()
-#         review.id = args.id
-        
-

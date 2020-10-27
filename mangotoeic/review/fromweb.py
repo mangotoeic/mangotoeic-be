@@ -10,7 +10,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from urllib.request import urlopen, Request
 
-from util.file_helper import FileReader
+from mangotoeic.utils.file_helper import FileReader
 from selenium import webdriver
 import time
 

@@ -1,19 +1,23 @@
 from mangotoeic.ext.db import db, openSession
-from mangotoeic.review.tokenizer import Prepro
+from mangotoeic.review.model import Prepro
 from mangotoeic.review.dto import ReviewDto 
 from mangotoeic.user.dto import UserDto
+from sqlalchemy import func
 import pandas as pd
 import json
 
 class ReviewDao(ReviewDto):
     
-    @classmethod
-    def find_all(cls):
-        return cls.query.all()
+    @staticmethod
+    def find_all():
+        Session = openSession()
+        session = Session()
+        df = session.query(ReviewDto).all() 
+        return session.query(ReviewDto).all()
 
     @classmethod 
-    def find_by_user_id(cls,user_id):
-        return cls.query.filter_by(user_id==user_id).all()
+    def find_by_user_id(cls,email):
+        return cls.query.filter_by(email==email).all()
 
     @classmethod
     def find_by_id(cls,id):
@@ -25,40 +29,45 @@ class ReviewDao(ReviewDto):
 
     @staticmethod
     def save(review):
-        print(review)
         Session = openSession()
         session = Session()
-        """"asasdasdasddddddddddnklkladskdsklndsnklsadnkdsnjsk"""
-        """"asasdasdasddddddddddnklkladskdsklndsnklsadnkdsnjsk"""
-        """"asasdasdasddddddddddnklkladskdsklndsnklsadnkdsnjsk"""
-        """"asasdasdasddddddddddnklkladskdsklndsnklsadnkdsnjsk"""
-        star
-        newReview = ReviewDto(id = review['id'], user_id = review['user_id'], review = review['review'], star )
-         
+
+        newReview = ReviewDto(id = review['id'], email = review['email'], review = review['review'], star = review['star'])
+
+        session.add(newReview)
+        session.commit()
+        
+    @staticmethod
+    def modify_review(review):
+        Session = openSession()
+        session = Session()
+        session.add(review)
+        session.commit()
+
+    @classmethod
+    def delete_review(cls,id):
+        Session = openSession()
+        session = Session()
+        data = cls.query.get(id)
+        session.delete(data)
+        session.commit()
+    
+    @staticmethod
+    def count():
+        Session = openSession()
+        session = Session()
+        return session.query(func.count(ReviewDto.id)).one()
+
     @staticmethod
     def insert_many():
         service = Prepro()
         Session = openSession()
         session = Session()
         df = service.get_data()
-        # print(df.head())
+        print(df.head())
         session.bulk_insert_mappings(ReviewDto, df.to_dict(orient = 'records'))
         session.commit()
         session.close()
         print('done') 
-        
-    @staticmethod
-    def modify_review(review):
-        db.session.add(review)
-        db.session.commit()
-
-    @classmethod
-    def delete_review(cls,id):
-        data = cls.query.get(id)
-        db.session.delete(data)
-        db.session.commit()
-
-# rd = ReviewDao()
-# rd.insert_many()
 
      
