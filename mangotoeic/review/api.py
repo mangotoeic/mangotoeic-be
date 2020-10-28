@@ -13,6 +13,7 @@ import keras
 import numpy as np
 
 parser = reqparse.RequestParser()
+
 parser.add_argument('email', type = str, required = True, help = 'This field should be email, cannot be left blank')
 parser.add_argument('review', type = str, required = True, help = 'This field should be review, cannot be left blank') 
 
@@ -20,42 +21,33 @@ class Review(Resource):
 
     @staticmethod
     def post():
-        args = parser.parse_args() 
-        review_vo = ReviewVo()    
-        review_vo.email = args.email
-        review_vo.email = args.review
-
-        reviewtext = WebCrawler.strip_emoji(args.review)
-        reviewtext = WebCrawler.cleanse(reviewtext)
-        reviewtext = Prepro.tokenize(reviewtext, Prepro.get_stopwords())
-        reviewtext = Prepro.encoding(reviewtext)
-        reviewtext = Prepro.zeropadding(reviewtext)
-
-
-        rnnmodel = keras.models.load_model('RNN_review_star_model')
-        predictions = rnnmodel.predict(reviewtext)
-        star = np.argmax(predictions[0])
-
+        args = parser.parse_args()
+        star = ReviewService.predict(args)
         print(f'예측 별점은 {star}입니다')
+        new_review = ReviewDto(email=args.email, review=args.review, star=star)
         
-        return {'star':int(star)}, 200 
-    
-    def get(self,id):
-        review = ReviewDao.find_by_id(id)
-        if review:
-            return review.json()
-        return {'message': 'review not found'}, 404 
+        try:
+            ReviewDao.save(new_review) 
+            return {'star': star}, 200
+        except:
+            return {'message' : ' an error occured while inserting review'}, 500 
+
+    # def get(self,id):
+    #     review = ReviewDao.find_by_id(id)
+    #     if review:
+    #         return review.json()
+    #     return {'message': 'review not found'}, 404 
 
 
-    def put(self, id):
-        data = Review.parser.parse_args()
-        searched = ReviewDao.find_by_id(id)
+    # def put(self, id):
+    #     data = Review.parser.parse_args()
+    #     searched = ReviewDao.find_by_id(id)
 
-        searched.email = searched['email']
-        searched.review = searched['review']      
-        searched.star = searched['star']
-        searched.save()
-        return searched.json()
+    #     searched.email = searched['email']
+    #     searched.review = searched['review']      
+    #     searched.star = searched['star']
+    #     searched.save()
+    #     return searched.json()
 
 class Reviews(Resource): 
 
@@ -73,3 +65,20 @@ class Reviews(Resource):
     #     print('===============6=========================')
 
     
+class ReviewService(object):
+
+    @staticmethod
+    def predict(input):
+        wc = WebCrawler()
+        model = Prepro()
+        reviewtext = wc.strip_emoji(input.review)
+        reviewtext = wc.cleanse(reviewtext)
+        reviewtext = model.tokenize(reviewtext, model.get_stopwords())
+        reviewtext = model.encoding(reviewtext)
+        reviewtext = model.zeropadding(reviewtext)
+
+        rnnmodel = keras.models.load_model('RNN_review_star_model')
+        predictions = rnnmodel.predict(reviewtext)
+        star = int(np.argmax(predictions[-1]))
+        return star
+        

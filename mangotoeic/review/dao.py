@@ -5,13 +5,13 @@ from mangotoeic.user.dto import UserDto
 from sqlalchemy import func
 import pandas as pd
 import json
-
+Session = openSession()
+session = Session()
 class ReviewDao(ReviewDto):
     
     @staticmethod
     def find_all():
-        Session = openSession()
-        session = Session()
+        
         df = session.query(ReviewDto).all() 
         return session.query(ReviewDto).all()
 
@@ -29,12 +29,7 @@ class ReviewDao(ReviewDto):
 
     @staticmethod
     def save(review):
-        Session = openSession()
-        session = Session()
-
-        newReview = ReviewDto(id = review['id'], email = review['email'], review = review['review'], star = review['star'])
-
-        session.add(newReview)
+        session.add(review)
         session.commit()
         
     @staticmethod

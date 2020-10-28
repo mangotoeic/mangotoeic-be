@@ -12,7 +12,8 @@ class ReviewDto(db.Model):
     star: int = db.Column(db.Integer) 
   
     
-    def __init__(self, email, review, star):
+    def __init__(self, id = None, email=None, review=None, star=None):
+        self.id = id
         self.email = email
         self.review = review
         self.star = star 
@@ -34,5 +35,5 @@ class ReviewVo:
     id: int = 1
     email : str = ''
     review: str = ''
-    star: int = 0 
+    star: int = 1
     

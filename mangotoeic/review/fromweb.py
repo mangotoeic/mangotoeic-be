@@ -16,7 +16,7 @@ import time
 
 class WebCrawler():
     def __init__(self):
-        self.driver = webdriver.Chrome('C:/Users/jongm/Desktop/chromedriver.exe')
+        self.driver = None
         self.reviews = []
     
     def hook_process(self):
@@ -24,12 +24,13 @@ class WebCrawler():
         # self.add_sentiment(df)
         self.get_data()
          
-
-    def strip_emoji(self,text):
+    @staticmethod
+    def strip_emoji(text):
         RE_EMOJI = re.compile(u'([\U00002600-\U000027BF])|([\U0001f300-\U0001f64F])|([\U0001f680-\U0001f6FF])')
         return RE_EMOJI.sub(r'', text)
-
-    def cleanse(self,text):
+        
+    @staticmethod
+    def cleanse(text):
         pattern = '[\r|\n]' # \r \n 제거
         text = re.sub(pattern,' ', text)
         RE_EMOJI = re.compile(u'([\U00002600-\U000027BF])|([\U0001f300-\U0001f64F])|([\U0001f680-\U0001f6FF])')
@@ -47,6 +48,7 @@ class WebCrawler():
         return text
 
     def webdata_toCsv(self,urls):
+        self.driver = webdriver.Chrome('C:/Users/jongm/Desktop/chromedriver.exe')
         for i in range(len(urls)):
             url = urls[i]
             self.driver.get(url)
@@ -72,7 +74,7 @@ class WebCrawler():
                 score = review.find('div', {'role':'img'})['aria-label']
                 star = score.split(' ')[3][0]
                 comment = review.find('span', {'jsname':"bN97Pc"}).get_text()
-                text = wc.cleanse(comment)
+                text = cleanse(comment)
                 if len(text) > 3:
                     self.reviews.append((text,star))
         self.driver.quit()    
