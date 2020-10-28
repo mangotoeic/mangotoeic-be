@@ -1,5 +1,5 @@
 from mangotoeic.ext.db import db
-from mangotoeic.user.dto import UserDto
+from mangotoeic.user.user import UserDto
 
 
 class MinitestDto(db.Model):

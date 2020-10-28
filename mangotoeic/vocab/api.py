@@ -15,7 +15,7 @@ parser.add_argument('vocab', type=str, required=True,
 parser.add_argument('correctAvg', type=float, required=True,
                                         help='This field should be a correctAvg')
 
-def Vocab(Resource):
+class Vocab(Resource):
     @staticmethod
     def post():
         args = parser.parse_args()

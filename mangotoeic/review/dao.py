@@ -1,7 +1,7 @@
 from mangotoeic.ext.db import db, openSession
 from mangotoeic.review.tokenizer import Prepro
 from mangotoeic.review.dto import ReviewDto 
-from mangotoeic.user.dto import UserDto
+from mangotoeic.user.user import UserDto
  
 
 
