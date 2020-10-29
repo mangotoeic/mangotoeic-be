@@ -1,49 +1,23 @@
-print('========== main ==========')
 from flask import Flask
 from flask_restful import Api
-print('========== db ==========')
 from mangotoeic.ext.db import url, db
-print('========== dbout ==========')
-print('========== home ==========')
 from mangotoeic.ext.routes import initialize_routes
-print('========== homeout ==========')
 from mangotoeic.user.api import User, Users
-
-from mangotoeic.odap.api import Odap
-from mangotoeic.vocab.api import Vocab, Vocabs
-from mangotoeic.review import review
-from mangotoeic.legacy import legacy
-from mangotoeic.vocab import vocab, vocabs
-
+from mangotoeic.odap.api import Odap, Odaps
+from mangotoeic.resource.legacy import LegacyDao 
 from flask_cors import CORS
 from mangotoeic.review.api import Review, Reviews
-
-
 app = Flask(__name__)
-CORS(app)
-print('========== url ==========')
+CORS(app, resources={r'/api/*': {"origins": "*"}})
 print(url)
-# app.register_blueprint(review)
-app.register_blueprint(legacy)
-app.register_blueprint(vocab)
-app.register_blueprint(vocabs)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 api = Api(app)
-
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
-initialize_routes(api)
-
 with app.app_context():
     db.create_all()
-
-
-@app.route('/api/test')
-def test():
-    return {'test':'SUCCESS'}
-print('========== url2 ==========' )
+    legacy_count = LegacyDao.count()
+    print(f'***** Users Total Count is {legacy_count} *****')
+    if legacy_count[0] == 0:
+        LegacyDao.bulk()
+initialize_routes(api)
