@@ -4,10 +4,6 @@ from flask_restful import Api
 from mangotoeic.resource.user import User, Users, Auth, Access
 from mangotoeic.review.api import Review,Reviews
 from mangotoeic.home.api import Home
-<<<<<<< HEAD
-from mangotoeic.vocab.api import Vocab, Vocabs
-=======
->>>>>>> master
 from mangotoeic.resource.legacy import Legacy, Legacies
 from mangotoeic.resource.minitest import Minitest
 from mangotoeic.resource.newq import NewQ , NewQs
@@ -31,20 +27,10 @@ access = Blueprint('access', __name__, url_prefix='/api/access')
 
 api = Api(legacy)
 api = Api(legacies)
-<<<<<<< HEAD
-
-
-user = Blueprint('user', __name__, url_prefix='/api/user')
-users = Blueprint('users', __name__, url_prefix='/api/users')
-auth = Blueprint('auth', __name__, url_prefix='/api/auth')
-access = Blueprint('access', __name__, url_prefix='/api/access')
-
-=======
 api = Api(odaps)
 api = Api(odap)
 api = Api(vocabs)
 api = Api(vocab)
->>>>>>> master
 api = Api(user)
 api = Api(users)
 api = Api(access)
@@ -58,19 +44,6 @@ def initialize_routes(api):
     # api.add_resource(Reviews, '/api/reviews/')
     api.add_resource(Legacy, '/api/legacy')
     api.add_resource(Legacies, '/api/legacies')
-<<<<<<< HEAD
-    # api.add_resource(Vocab, '/api/vocab/')
-    # api.add_resource(Vocabs, '/api/vocabs')
-    api.add_resource(Access, '/api/access')
-    api.add_resource(Auth, '/api/auth')
-
-@user.errorhandler(500)
-def user_api_error(e):
-    logging.exception('An error occurred during user request. %s' % str(e))
-    return 'An internal error occurred.', 500
-
-
-=======
     api.add_resource(Odaps, '/api/odaps')
     api.add_resource(Odap, '/api/odap')
     api.add_resource(Vocabs, '/api/vocabs')
@@ -78,14 +51,11 @@ def user_api_error(e):
     api.add_resource(Access, '/api/access')
     api.add_resource(Auth, '/api/auth')
     
->>>>>>> master
 @legacy.errorhandler(500)
 def legacy_api_error(e):
     logging.exception('An error occurred during home request. %s' % str(e))
     return 'An internal error occurred.', 500
 
-<<<<<<< HEAD
-=======
 @odap.errorhandler(500)
 def odap_api_error(e):
     logging.exception('An error occurred during home request. %s' % str(e))
@@ -101,4 +71,3 @@ def user_api_error(e):
     logging.exception('An error occurred during user request. %s' % str(e))
     return 'An internal error occurred.', 500
     
->>>>>>> master
