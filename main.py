@@ -2,8 +2,13 @@ from flask import Flask, request
 from flask_restful import Api
 from mangotoeic.ext.db import url, db
 from mangotoeic.ext.routes import initialize_routes
+<<<<<<< HEAD
 from mangotoeic.odap.api import Odap, Odaps
+=======
+from mangotoeic.resource.user import User, Users
+>>>>>>> master
 from mangotoeic.resource.legacy import LegacyDao 
+from mangotoeic.resource.vocab import VocabDao 
 from flask_cors import CORS
 from mangotoeic.resource.user import User, Users, UserDto, UserDao
 from mangotoeic.review.api import Review, Reviews
@@ -42,6 +47,7 @@ with app.app_context():
     if legacy_count[0] == 0:
         LegacyDao.bulk()
 
+<<<<<<< HEAD
     user_count = UserDao.count()
     print(f'***** Users Total Count is {user_count} *****')
     if user_count[0] == 0:
@@ -49,4 +55,12 @@ with app.app_context():
 
     
         
+=======
+    vocab_count = VocabDao.count()
+    print(f'***** Users Total Count is {vocab_count} *****')
+    if vocab_count[0] == 0:
+        VocabDao.bulk()
+
+
+>>>>>>> master
 initialize_routes(api)
