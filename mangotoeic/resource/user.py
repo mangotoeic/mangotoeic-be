@@ -7,6 +7,8 @@ from sqlalchemy.orm import sessionmaker
 from mangotoeic.ext.db import db, openSession, engine
 from mangotoeic.ext.db import Base
 import json
+import os 
+basedir = os.path.dirname(os.path.abspath(__file__))
 
 # 토익 시험 몇번 봤는지, 목표점수, 시험날짜, 본인의 영어실력 입력
 # 데이터 베이스에 반영할 건지?
@@ -99,9 +101,9 @@ class UserDao(UserDto):
 
     @classmethod
     def userdata_to_sql(cls):
-        df = pd.read_csv('./mangotoeic/resource/data/user_table_prepro3.csv',) # 정제된 데이터로 변경 예정
-        db.engine.execute("DROP TABLE IF EXISTS USERS;")
-        df.to_sql(name='users', con=engine.connect(), index=False)
+        df = pd.read_csv(os.path.join( basedir,'data/user_table_prepro3.csv')) # 정제된 데이터로 변경 예정
+        db.engine.execute("DROP TABLE IF EXISTS users;")
+        df.to_sql(name='users', con=db.engine.connect(), index=False)
         engine.connect().close()
 
     @classmethod
