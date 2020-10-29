@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "/Users/kwonhyunah/opt/anaconda3/envs/tensorflow/bin/python",
+    "python.pythonPath": "/Users/kwonhyunah/opt/anaconda3/envs/new/bin/python",
     "python.dataScience.jupyterServerURI": "local"
 }
