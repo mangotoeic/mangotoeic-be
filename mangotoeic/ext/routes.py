@@ -2,10 +2,21 @@ import logging
 from flask import Blueprint
 from flask_restful import Api
 from mangotoeic.user.user import User, Users, Auth, Access
+from mangotoeic.user.api import User, Users
 from mangotoeic.review.api import Review,Reviews
 from mangotoeic.home.api import Home
 from mangotoeic.legacy.api import Legacy ,Legacies
 from mangotoeic.vocab.api import Vocab, Vocabs
+from mangotoeic.resource.legacy import Legacy, Legacies
+from mangotoeic.resource.minitest import Minitest
+from mangotoeic.resource.newq import NewQ , NewQs
+from mangotoeic.resource.recommendation import Recommendation
+
+legacies = Blueprint('legacies', __name__, url_prefix='/api/legacies')
+legacy = Blueprint('legacy', __name__, url_prefix='/api/legacy')
+
+api = Api(legacy)
+api = Api(legacies)
 
 
 user = Blueprint('user', __name__, url_prefix='/api/user')
@@ -19,7 +30,6 @@ api = Api(access)
 api = Api(auth)
 
 def initialize_routes(api):
-    print('===============initialize===================')
     api.add_resource(Home, '/api')
     api.add_resource(User, '/api/user')
     api.add_resource(Users, '/api/users')
@@ -36,3 +46,10 @@ def initialize_routes(api):
 def user_api_error(e):
     logging.exception('An error occurred during user request. %s' % str(e))
     return 'An internal error occurred.', 500
+
+
+@legacy.errorhandler(500)
+def legacy_api_error(e):
+    logging.exception('An error occurred during home request. %s' % str(e))
+    return 'An internal error occurred.', 500
+
