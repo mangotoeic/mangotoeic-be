@@ -39,7 +39,7 @@ def diagnosis():
 with app.app_context():
     db.create_all()
     legacy_count = LegacyDao.count()
-    print(f'***** Lagacies Total Count is {legacy_count} *****')
+    print(f'***** Legacies Total Count is {legacy_count} *****')
     if legacy_count[0] == 0:
         LegacyDao.bulk()
 
