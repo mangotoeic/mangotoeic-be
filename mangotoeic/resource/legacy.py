@@ -21,6 +21,7 @@ class LegacyPro:
         df=self.fileread()
         df=self.filerename(df)
         return df
+
     def fileread(self):
         df= pd.read_json(self.fpath)
         print(df.transpose())
@@ -29,6 +30,7 @@ class LegacyPro:
         # df=df.set_index(['index'])
         # print(df)
         return df.transpose()
+        
     def filerename(self,df):
         df= df.rename(columns={'1':"ansA","2":"ansB","3":"ansC","4":"ansD","question":"question","anwser":"answer"})
         print(df)
@@ -168,5 +170,7 @@ class Legacies(Resource):
 
 
 if __name__ == '__main__':
-    prepro = LegacyPro()
-    prepro.hook()
+    # prepro = LegacyPro()
+    # prepro.hook()
+    input_table = LegacyDao
+    input_table.bulk()
