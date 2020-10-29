@@ -6,7 +6,8 @@ from flask import request
 from flask_restful import Resource, reqparse
 import json
 from sqlalchemy import func
-
+import os
+basedir= os.path.dirname(os.path.abspath(__file__))
 parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
 parser.add_argument('userid', type=str, required=True,
                                         help='This field should be a userid')
@@ -15,7 +16,7 @@ parser.add_argument('password', type=str, required=True,
 class LegacyPro:
     def __init__(self):
 
-        self.fpath ='./data/toeic_test.json'
+        self.fpath = os.path.join(basedir,'data/toeic_test.json')
     def hook(self):
         df=self.fileread()
         df=self.filerename(df)
@@ -40,11 +41,11 @@ class  LegacyDto(db.Model):
     __table_args__={'mysql_collate':'utf8_general_ci'}
     qId = db.Column(db.Integer, primary_key = True, index = True)
     question = db.Column(db.VARCHAR(300))
-    ansA = db.Column(db.CHAR(10))
-    ansB = db.Column(db.CHAR(10))
-    ansC = db.Column(db.CHAR(10))
-    ansD = db.Column(db.CHAR(10))
-    answer = db.Column(db.CHAR(10))
+    ansA = db.Column(db.CHAR(255))
+    ansB = db.Column(db.CHAR(255))
+    ansC = db.Column(db.CHAR(255))
+    ansD = db.Column(db.CHAR(255))
+    answer = db.Column(db.CHAR(255))
 
     def __init__(self, qId, question, ansA , ansB, ansC,ansD ,answer):
         self.qId = qId
