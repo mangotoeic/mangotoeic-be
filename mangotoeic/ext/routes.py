@@ -1,11 +1,9 @@
 import logging
 from flask import Blueprint
 from flask_restful import Api
-from mangotoeic.user.user import User, Users, Auth, Access
-from mangotoeic.user.api import User, Users
+from mangotoeic.resource.user import User, Users, Auth, Access
 from mangotoeic.review.api import Review,Reviews
 from mangotoeic.home.api import Home
-from mangotoeic.legacy.api import Legacy ,Legacies
 from mangotoeic.vocab.api import Vocab, Vocabs
 from mangotoeic.resource.legacy import Legacy, Legacies
 from mangotoeic.resource.minitest import Minitest

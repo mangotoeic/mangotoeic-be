@@ -1,9 +1,10 @@
 import pandas as pd
 from flask import request
 from flask_restful import Resource, reqparse
-from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
+from sqlalchemy import Column, Integer, String, ForeignKey, create_engine, func
+from sqlalchemy import engine
 from sqlalchemy.orm import sessionmaker
-from mangotoeic.ext.db import db, openSession
+from mangotoeic.ext.db import db, openSession, engine
 from mangotoeic.ext.db import Base
 import json
 
@@ -14,7 +15,8 @@ class UserDto(db.Model):
     __tablename__ = 'users'
     __table_args__={'mysql_collate':'utf8_general_ci'}
 
-    user_id = db.Column(db.Integer, primary_key=True, index=False)
+    id = db.Column(db.Integer, primary_key=True, index=True)
+    user_id = db.Column(db.Integer)
     timestamp = db.Column(db.Integer)
     user_name = db.Column(db.String(20))
     password = db.Column(db.String(20))
@@ -24,16 +26,8 @@ class UserDto(db.Model):
     prior_question_elapsed_time = db.Column(db.Float)
     email = db.Column(db.String(20))
 
-    # password: str = ''
-    # email: str = ''
-    # user_name : str = ''
-    # user_id : int = 0
-    # qId : int = 0
-    # user_answer : int = 0
-    # answered_correctly : float = 0.0
-    # prior_question_elapsed_time : float = 0.0
-    # email : str = ''
     def __init__(self, user_id=0, user_name='', password='', qId=0, user_answer=0, answered_correctly=0.0, prior_question_elapsed_time=0.0, email='', timestamp=0):
+        self.id = id
         self.timestamp = timestamp
         self.user_id = user_id
         self.user_name = user_name
@@ -53,6 +47,7 @@ class UserDto(db.Model):
     @property
     def json(self):
         return {
+            'id' : self.id,
             'timestamp' : self.timestamp,
             'user_id' : self.user_id,
             'user_name' : self.user_name,
@@ -84,6 +79,7 @@ class UserDto(db.Model):
 
 
 class UserVo:
+    id : int = 0
     timestamp: int = 0
     password: str = ''
     email: str = ''
@@ -96,21 +92,17 @@ class UserVo:
     email : str = ''
     
 
-
 class UserDao(UserDto):
-    engine = create_engine('mysql+mysqlconnector://root:root@127.0.0.1/mariadb?charset=utf8', encoding='utf8', echo=True)
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    base = Base()
 
     def __init__(self):
         pass
 
     @classmethod
-    def userdata_to_sql(self):
-        df = pd.read_csv('./mangotoeic/user/data/user_table_prepro.csv',) # 정제된 데이터로 변경 예정
-        self.conn = self.engine.connect()
-        df.to_sql(name='users', con=self.conn, if_exists='append', index=False)
+    def userdata_to_sql(cls):
+        df = pd.read_csv('./mangotoeic/resource/data/user_table_prepro3.csv',) # 정제된 데이터로 변경 예정
+        db.engine.execute("DROP TABLE IF EXISTS USERS;")
+        df.to_sql(name='users', con=engine.connect(), index=False)
+        engine.connect().close()
 
     @classmethod
     def find_all(cls):
@@ -131,14 +123,24 @@ class UserDao(UserDto):
             .filter(cls.email.like(user.email))\
             .filter(cls.password.like(user.password))
         df = pd.read_sql(sql.statement, sql.session.bind)
-        print(json.loads(df.to_json(orient='records')))
+        # print(json.loads(df.to_json(orient='records')))
         return json.loads(df.to_json(orient='records'))
+
+    @staticmethod
+    def count():
+        Session = openSession()
+        session = Session()
+        return session.query(func.count(UserDto.user_id)).one()
             
 
     @staticmethod
     def save(user):
         db.session.add(user)
         db.session.commit()
+
+    def update_user(self, userid, column, value):
+        self.session.query(UserDto).filter(UserDto.user_id == userid).update({column : value})
+        self.session.commit()
 
     @staticmethod
     def modify_user(user):
@@ -252,3 +254,13 @@ class Access(Resource):
         user.email = args.email
         data = UserDao.login(user)
         return data[0], 200
+
+
+if __name__ == "__main__":
+    userdao = UserDao()
+    userdao.userdata_to_sql()
+    # userdao.add_user('444', 9834, 3, 1, 39000)
+    # userdao.delete_user('115')        
+    # userdao.update_user(16, 'email', 'kim')
+    # userdao.update_user(user_id_loop, names_loop)
+    # a = userdao.fetch_user('666')

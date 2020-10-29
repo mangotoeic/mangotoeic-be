@@ -1,6 +1,6 @@
 from mangotoeic.ext.db import db
 #from mango.user.dto import UserDto
-from mangotoeic.minitest.dto import MinitestDto
+# from mangotoeic.minitest.dto import MinitestDto
 
 class VocabDto(db.Model):
 

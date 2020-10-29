@@ -1,5 +1,5 @@
 from mangotoeic.ext.db import db
-from mangotoeic.user.user import UserDto
+from mangotoeic.resource.user import UserDto
 
 class ReviewDto(db.Model):
     __tablename__ = "reviews"

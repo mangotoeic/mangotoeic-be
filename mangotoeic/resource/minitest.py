@@ -1,5 +1,5 @@
 from mangotoeic.ext.db import db
-from mangotoeic.user.dto import UserDto
+from mangotoeic.resource.user import UserDto
 from flask_restful import Resource, reqparse
 
 class MinitestDto(db.Model):
