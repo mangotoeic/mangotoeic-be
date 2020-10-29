@@ -8,11 +8,6 @@ import json
 from sqlalchemy import func
 import os
 basedir= os.path.dirname(os.path.abspath(__file__))
-<<<<<<< HEAD
-
-
-=======
->>>>>>> master
 parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
 parser.add_argument('userid', type=str, required=True,
                                         help='This field should be a userid')
@@ -20,14 +15,8 @@ parser.add_argument('password', type=str, required=True,
                                         help='This field should be a password')
 class LegacyPro:
     def __init__(self):
-<<<<<<< HEAD
-        self.fpath ='./data/toeic_test.json'
-        self.fpath = os.path.join(basedir,'data/toeic_test.json')
-
-=======
 
         self.fpath = os.path.join(basedir,'data/toeic_test.json')
->>>>>>> master
     def hook(self):
         df=self.fileread()
         df=self.filerename(df)
