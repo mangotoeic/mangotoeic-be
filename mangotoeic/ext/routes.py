@@ -1,6 +1,6 @@
 # from mangotoeic.item.api import Item, Items
 from mangotoeic.user.api import User, Users
-from mangotoeic.review.api import Review,Reviews
+from mangotoeic.resource.review import Review,Reviews
 # from mangotoeic.article.api import Article, Articles
 from mangotoeic.home.api import Home
 import logging

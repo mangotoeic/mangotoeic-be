@@ -10,8 +10,7 @@ from mangotoeic.recommendation.api import Recommendation, Recommendations
 from mangotoeic.review.api import Review, Reviews
 from mangotoeic.odap.api import Odap, Odaps
 from mangotoeic.vocab.api import Vocab, Vocabs
-from mangotoeic.review.dao import ReviewDao
-from mangotoeic.review.dto import ReviewDto
+from mangotoeic.resource.review import ReviewDao
 from mangotoeic.review import review
 from mangotoeic.review.model import Prepro  
 from mangotoeic.review.fromweb import WebCrawler
