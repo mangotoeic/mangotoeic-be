@@ -1,3 +1,4 @@
+from flask.globals import session
 import pandas as pd
 from flask import request
 from flask_restful import Resource, reqparse
@@ -17,7 +18,7 @@ class UserDto(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, index=True)
     user_id = db.Column(db.Integer)
-    timestamp = db.Column(db.Integer)
+    timestamp = db.Column(db.Float)
     user_name = db.Column(db.String(20))
     password = db.Column(db.String(20))
     qId = db.Column(db.Integer)
@@ -97,12 +98,14 @@ class UserDao(UserDto):
     def __init__(self):
         pass
 
-    @classmethod
-    def userdata_to_sql(cls):
-        df = pd.read_csv('./mangotoeic/resource/data/user_table_prepro3.csv',) # 정제된 데이터로 변경 예정
-        db.engine.execute("DROP TABLE IF EXISTS USERS;")
-        df.to_sql(name='users', con=engine.connect(), index=False)
-        engine.connect().close()
+    @staticmethod
+    def bulk():
+        Session = openSession()
+        session = Session()
+        df = pd.read_csv('./mangotoeic/resource/data/user_table_prepro3.csv')
+        session.bulk_insert_mappings(UserDto, df.to_dict(orient="records"))
+        session.commit()
+        session.close()
 
     @classmethod
     def find_all(cls):
@@ -139,8 +142,10 @@ class UserDao(UserDto):
         db.session.commit()
 
     def update_user(self, userid, column, value):
-        self.session.query(UserDto).filter(UserDto.user_id == userid).update({column : value})
-        self.session.commit()
+        Session = openSession()
+        session = Session()
+        session.query(UserDto).filter(UserDto.user_id == userid).update({column : value})
+        session.commit()
 
     @staticmethod
     def modify_user(user):
@@ -256,11 +261,11 @@ class Access(Resource):
         return data[0], 200
 
 
-if __name__ == "__main__":
-    userdao = UserDao()
-    userdao.userdata_to_sql()
+# if __name__ == "__main__":
+#     userdao = UserDao()
+#     userdao.userdata_to_sql()
     # userdao.add_user('444', 9834, 3, 1, 39000)
     # userdao.delete_user('115')        
-    # userdao.update_user(16, 'email', 'kim')
+    # userdao.update_user(1, 'user_name', '박지성')
     # userdao.update_user(user_id_loop, names_loop)
     # a = userdao.fetch_user('666')
