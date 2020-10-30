@@ -11,21 +11,24 @@ class ReviewDao(ReviewDto):
     
     @staticmethod
     def find_all():
-        
-        df = session.query(ReviewDto).all() 
         return session.query(ReviewDto).all()
 
     @classmethod 
-    def find_by_user_id(cls,email):
-        return cls.query.filter_by(email==email).all()
+    def find_by_email(cls,email):
+        return session.query(ReviewDto).filter(ReviewDto.email.like(f'%{email}%')).all() 
+      
 
     @classmethod
     def find_by_id(cls,id):
-        return cls.query.filter_by(id==id).first()
+        return session.query(ReviewDto).filter(ReviewDto.email.like(f'%{id}%')).one()
 
     @classmethod
     def find_by_star(cls,star):
-        return cls.query.filter_by(star==star).first()
+        return session.query(ReviewDto).filter(ReviewDto.email.like(f'%{star}%')).all()
+
+    @classmethod
+    def find_by_review(cls,review):
+        return session.query(ReviewDto).filter(ReviewDto.email.like(f'%{review}%')).all()
 
     @staticmethod
     def save(review):
@@ -33,14 +36,14 @@ class ReviewDao(ReviewDto):
         session.commit()
         
     @staticmethod
-    def modify_review(review):
+    def update(review):
         Session = openSession()
         session = Session()
         session.add(review)
         session.commit()
 
     @classmethod
-    def delete_review(cls,id):
+    def delete(cls,id):
         Session = openSession()
         session = Session()
         data = cls.query.get(id)

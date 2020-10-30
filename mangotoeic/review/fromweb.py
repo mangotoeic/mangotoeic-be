@@ -72,9 +72,9 @@ class WebCrawler():
             
             for review in allreviews:
                 score = review.find('div', {'role':'img'})['aria-label']
-                star = score.split(' ')[3][0]
+                star = int(score.split(' ')[3][0]) - 1
                 comment = review.find('span', {'jsname':"bN97Pc"}).get_text()
-                text = cleanse(comment)
+                text = WebCrawler.cleanse(comment)
                 if len(text) > 3:
                     self.reviews.append((text,star))
         self.driver.quit()    

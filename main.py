@@ -49,5 +49,4 @@ with app.app_context():
         ReviewDao.insert_many()
   
 initialize_routes(api)
-
  

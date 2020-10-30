@@ -22,48 +22,51 @@ class Review(Resource):
     @staticmethod
     def post():
         args = parser.parse_args()
-        star = ReviewService.predict(args)
-        print(f'예측 별점은 {star}입니다')
-        new_review = ReviewDto(email=args.email, review=args.review, star=star)
-        
+        probstar = ReviewService.predict(args)
+        print(f'예측 별점은 {probstar[0]}% 의 확률로 {probstar[1]}입니다')
+        new_review = ReviewDto(email=args.email, review=args.review, star=probstar[1])
+        print(new_review)
         try:
             ReviewDao.save(new_review) 
-            return {'star': star}, 200
+            return {'star': probstar[1], 'prob':probstar[0]}, 200
         except:
             return {'message' : ' an error occured while inserting review'}, 500 
 
-    # def get(self,id):
-    #     review = ReviewDao.find_by_id(id)
-    #     if review:
-    #         return review.json()
-    #     return {'message': 'review not found'}, 404 
+    @staticmethod
+    def get(email):
+        try:
+            review = ReviewDao.find_by_email(email)
+            if review:
+                return review.json()
+        except Exception as e:
+            return {'message': 'review not found'}, 404 
 
+    @staticmethod
+    def update():
+        args = parser.parse_args()
+        print(f'Review {args.email} updated')
+        return {'code' :0, 'message' : 'Success'}, 200
 
-    # def put(self, id):
-    #     data = Review.parser.parse_args()
-    #     searched = ReviewDao.find_by_id(id)
+    @staticmethod
+    def delete():
+        args = parser.parse_args()
+        print(f'Review posted by {args.email} deleted')
+        return {'code' :0, 'message' : 'Success'}, 200
 
-    #     searched.email = searched['email']
-    #     searched.review = searched['review']      
-    #     searched.star = searched['star']
-    #     searched.save()
-    #     return searched.json()
+ 
 
 class Reviews(Resource): 
 
-    def get(self):
-        df = pd.read_sql_table('reviews', engine.connect())
+    @staticmethod
+    def get():
+        df = pd.read_sql_table('reviews', engine.connect()) 
         return json.loads(df.to_json(orient = 'records'))
 
-
-        # return {'reviews': list(map(lambda review: review.json(), ReviewDao.find_all()))}
-  
-    # def post(self):
-    #     rd = ReviewDao()
-    #     rd.insert_many('reviews')
+    @staticmethod
+    def post():
+        rd = ReviewDao()
+        rd.insert_many('reviews')
         
-    #     print('===============6=========================')
-
     
 class ReviewService(object):
 
@@ -77,8 +80,10 @@ class ReviewService(object):
         reviewtext = model.encoding(reviewtext)
         reviewtext = model.zeropadding(reviewtext)
 
-        rnnmodel = keras.models.load_model('RNN_review_star_model')
+        rnnmodel = keras.models.load_model('RNN_review_star_model.h5')
         predictions = rnnmodel.predict(reviewtext)
-        star = int(np.argmax(predictions[-1]))
-        return star
+        prob = predictions[-1][np.argmax(predictions[-1])]*100
+        prob = round(prob, 2)
+        star = int(np.argmax(predictions[-1])) + 1
+        return [prob,star]
         
