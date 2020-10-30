@@ -8,6 +8,8 @@ from sqlalchemy.orm import sessionmaker
 from mangotoeic.ext.db import db, openSession, engine
 from mangotoeic.ext.db import Base
 import json
+import os 
+basedir = os.path.dirname(os.path.abspath(__file__))
 
 # 토익 시험 몇번 봤는지, 목표점수, 시험날짜, 본인의 영어실력 입력
 # 데이터 베이스에 반영할 건지?
@@ -106,6 +108,7 @@ class UserDao(UserDto):
         session.bulk_insert_mappings(UserDto, df.to_dict(orient="records"))
         session.commit()
         session.close()
+
 
     @classmethod
     def find_all(cls):
