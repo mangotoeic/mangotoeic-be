@@ -96,6 +96,7 @@ class VocabDao(VocabDto):
     def delete_vocab(cls, userid, vocabId):
         del_vocab = cls.query.filter(userid == userid, vocabId == vocabId).delete(vocabId)
         return del_vocab
+        
     @staticmethod
     def count():
         Session = openSession()
