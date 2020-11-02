@@ -108,17 +108,17 @@ class Odap(Resource):
         return {'code':0, 'message':'SUCCESS'}, 200
 
 class Odaps(Resource):
-    # def get(self):
-    #     return {'odaps': list(map(lambda odap: odap.json(), OdapDao.find_all()))}
+    def get(self):
+        data = OdapDao.find_all()
+        return data, 200
+
     def post(self):
         body = request.get_json()
         print(body)
         df=pd.DataFrame.from_dict(body)
         OdapDao.bulk(df)
-        # user = OdapDto(**body)
-        # OdapDao.save(user)
-
-        
+        user = OdapDto(**body)
+        OdapDao.save(user)
         return {'id': "good"}, 200
     
     #{'user_id': None, 'qId': [2, 3, 4]}
