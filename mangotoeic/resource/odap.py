@@ -31,7 +31,7 @@ class OdapDto(db.Model):
     id: int = db.Column(db.Integer, primary_key=True, index=True)
     user_id: int = db.Column(db.Integer)
     qId: int = db.Column(db.Integer, db.ForeignKey("legacies.qId"),nullable=False) # db.ForeignKey(MinitestDto.qId)
-    legacy = db.relationship("LegacyDto")
+    
     
     def __init__(self, user_id, qId):
         self.user_id = user_id
