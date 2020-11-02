@@ -81,7 +81,7 @@ class OdapDao(OdapDto):
     def join(cls):
         for u, a in session.query(LegacyDto,OdapDto).\
                     filter(LegacyDto.qId==OdapDto.qId).\
-                    filter(OdapDto.user_id=='jack@google.com').\
+                    filter(OdapDto.user_id=='1').\
                         all():
             print(u)
             print(a)
