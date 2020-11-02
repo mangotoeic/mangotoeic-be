@@ -1,4 +1,4 @@
-from mangotoeic.ext.db import db
+from mangotoeic.ext.db import db, openSession
 from mangotoeic.resource.minitest import MinitestDto
 import pandas as pd
 import json
@@ -28,12 +28,11 @@ class OdapDto(db.Model):
     
     __tablename__ = 'odap'
     __table_args__={'mysql_collate':'utf8_general_ci'}
-
-    user_id: int = db.Column(db.Integer, primary_key=True, index=True)
-    #userid: int = db.Column(db.Integer, db.ForeignKey(UserDto.user_id))
+    id: int = db.Column(db.Integer, primary_key=True, index=True)
+    user_id: int = db.Column(db.Integer)
     qId: int = db.Column(db.Integer) # db.ForeignKey(MinitestDto.qId)
 
-    def __init__(self, userid, qId):
+    def __init__(self, user_id, qId):
         self.user_id = user_id
         self.qId = qId
     
@@ -68,6 +67,14 @@ class OdapDao(OdapDto):
     def delete_odap(cls, userid, qId):
         del_odap = cls.query.filter(userid == userid, qId == qId).delete(qId)
         return del_odap
+    
+    @staticmethod   
+    def bulk(data):
+        Session = openSession()
+        session = Session()
+        session.bulk_insert_mappings(OdapDto, data.to_dict(orient="records"))
+        session.commit()
+        session.close()
 
 parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
 parser.add_argument('user_id', type=int, required=True,
@@ -101,9 +108,21 @@ class Odap(Resource):
         return {'code':0, 'message':'SUCCESS'}, 200
 
 class Odaps(Resource):
-    def get(self):
-        return {'odaps': list(map(lambda odap: odap.json(), OdapDao.find_all()))}
-    # def post(self):
+    # def get(self):
+    #     return {'odaps': list(map(lambda odap: odap.json(), OdapDao.find_all()))}
+    def post(self):
+        body = request.get_json()
+        print(body)
+        df=pd.DataFrame.from_dict(body)
+        OdapDao.bulk(df)
+        # user = OdapDto(**body)
+        # OdapDao.save(user)
+
+        
+        return {'id': "good"}, 200
+    
+    #{'user_id': None, 'qId': [2, 3, 4]}
+
         
 if __name__ == '__main__':
     prepro = OdapPro()
