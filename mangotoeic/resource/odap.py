@@ -117,8 +117,8 @@ class Odaps(Resource):
         print(body)
         df=pd.DataFrame.from_dict(body)
         OdapDao.bulk(df)
-        # user = OdapDto(**body)
-        # OdapDao.save(user)
+        user = OdapDto(**body)
+        OdapDao.save(user)
         return {'id': "good"}, 200
     
     #{'user_id': None, 'qId': [2, 3, 4]}
