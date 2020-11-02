@@ -1,5 +1,6 @@
 from mangotoeic.ext.db import db, openSession
 from mangotoeic.resource.minitest import MinitestDto
+from mangotoeic.resource.legacy import LegacyDto
 import pandas as pd
 import json
 from typing import List
@@ -7,7 +8,8 @@ from flask import request, jsonify
 from flask_restful import Resource, reqparse
 import os
 basedir= os.path.dirname(os.path.abspath(__file__))
-
+Session = openSession()
+session = Session()
 class OdapPro:
     def __init__(self):
         self.fpath =''
@@ -71,11 +73,19 @@ class OdapDao(OdapDto):
     
     @staticmethod   
     def bulk(data):
-        Session = openSession()
-        session = Session()
+        
         session.bulk_insert_mappings(OdapDto, data.to_dict(orient="records"))
         session.commit()
         session.close()
+    @classmethod
+    def join(cls):
+        for u, a in session.query(LegacyDto,OdapDto).\
+                    filter(LegacyDto.qId==OdapDto.qId).\
+                    filter(OdapDto.user_id=='jack@google.com').\
+                        all():
+            print(u)
+            print(a)
+        
 
 parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
 parser.add_argument('user_id', type=int, required=True,
@@ -125,5 +135,5 @@ class Odaps(Resource):
 
         
 if __name__ == '__main__':
-    prepro = OdapPro()
-    prepro.hook()
+    prepro = OdapDao
+    prepro.join()
