@@ -60,7 +60,7 @@ class  LegacyDto(db.Model):
         
         
     def __repr__(self):
-        return f'legacies(id={self.id},ansA={self.ansA},ansB={self.ansB},ansC={self.ansC},ansD={self.ansD},answer={self.answer},question={self.question},qId ={self.qId})'
+        return f'legacies(ansA={self.ansA},ansB={self.ansB},ansC={self.ansC},ansD={self.ansD},answer={self.answer},question={self.question},qId ={self.qId})'
 
 
         
