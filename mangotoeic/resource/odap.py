@@ -30,8 +30,9 @@ class OdapDto(db.Model):
     __table_args__={'mysql_collate':'utf8_general_ci'}
     id: int = db.Column(db.Integer, primary_key=True, index=True)
     user_id: int = db.Column(db.Integer)
-    qId: int = db.Column(db.Integer) # db.ForeignKey(MinitestDto.qId)
-
+    qId: int = db.Column(db.Integer, db.ForeignKey("legacies.qId"),nullable=False) # db.ForeignKey(MinitestDto.qId)
+    legacy = db.relationship("LegacyDto")
+    
     def __init__(self, user_id, qId):
         self.user_id = user_id
         self.qId = qId
@@ -117,8 +118,7 @@ class Odaps(Resource):
         print(body)
         df=pd.DataFrame.from_dict(body)
         OdapDao.bulk(df)
-        user = OdapDto(**body)
-        OdapDao.save(user)
+
         return {'id': "good"}, 200
     
     #{'user_id': None, 'qId': [2, 3, 4]}
