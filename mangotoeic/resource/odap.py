@@ -1,13 +1,17 @@
-from mangotoeic.ext.db import db
+from mangotoeic.ext.db import db, openSession,engine
 from mangotoeic.resource.minitest import MinitestDto
+from mangotoeic.resource.legacy import LegacyDto
+from sqlalchemy.orm import mapper
 import pandas as pd
 import json
 from typing import List
 from flask import request, jsonify
 from flask_restful import Resource, reqparse
 import os
-basedir= os.path.dirname(os.path.abspath(__file__))
 
+basedir= os.path.dirname(os.path.abspath(__file__))
+Session = openSession()
+session = Session()
 class OdapPro:
     def __init__(self):
         self.fpath =''
@@ -28,14 +32,11 @@ class OdapDto(db.Model):
     
     __tablename__ = 'odap'
     __table_args__={'mysql_collate':'utf8_general_ci'}
+    id: int = db.Column(db.Integer, primary_key=True, index=True)
+    user_id: int = db.Column(db.Integer)
+    qId: int = db.Column(db.Integer, db.ForeignKey('legacies.qId'))
+    # legacy_id = db.relationship("LegacyDao", back_populates='odap')  
 
-    user_id: int = db.Column(db.Integer, primary_key=True, index=True)
-    #userid: int = db.Column(db.Integer, db.ForeignKey(UserDto.user_id))
-    qId: int = db.Column(db.Integer) # db.ForeignKey(MinitestDto.qId)
-
-    def __init__(self, userid, qId):
-        self.user_id = user_id
-        self.qId = qId
     
     def __repr__(self):
         return f'user_id={self.user_id}, qId={self.qId}'
@@ -68,6 +69,34 @@ class OdapDao(OdapDto):
     def delete_odap(cls, userid, qId):
         del_odap = cls.query.filter(userid == userid, qId == qId).delete(qId)
         return del_odap
+    @classmethod
+    def add_odap2(cls,data):
+        user_id= data['user_id']
+        print(user_id)
+        for qid in data['qId']:
+            some_question=LegacyDto.query.filter_by(qId=qid).first()
+            print(some_question)
+        
+            x=OdapDto(user_id=user_id, legacy=some_question)
+            db.session.add(x)    
+        db.session.commit()
+    
+    @staticmethod   
+    def bulk(data):
+        
+        session.bulk_insert_mappings(OdapDto, data.to_dict(orient="records"))
+        session.commit()
+        session.close()
+    
+    @classmethod
+    def join(cls):
+        for u, a in session.query(LegacyDto,cls).\
+                    filter(LegacyDto.qId==cls.qId).\
+                    filter(OdapDto.user_id=='16').\
+                        all():
+            print(u)
+            print(a)
+        
 
 parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
 parser.add_argument('user_id', type=int, required=True,
@@ -102,9 +131,28 @@ class Odap(Resource):
 
 class Odaps(Resource):
     def get(self):
-        return {'odaps': list(map(lambda odap: odap.json(), OdapDao.find_all()))}
-    # def post(self):
+        data = OdapDao.find_all()
+        return data, 200
+
+    def post(self):
+        body = request.get_json()
+        print(body)
+        # df=pd.DataFrame.from_dict(body)
+        OdapDao.add_odap2(body)
+
+        return {'id': "good"}, 200
+    
+    #{'user_id': None, 'qId': [2, 3, 4]}
+
         
 if __name__ == '__main__':
-    prepro = OdapPro()
-    prepro.hook()
+    # association_table= db.Table('association', db.metadata,db.Column('legacies',db.Integer,db.ForeignKey('legacies.qId')))
+    # print(type(association_table))
+    # for t in db.metadata.sorted_tables:
+    #     print(t.name)
+    # for c in association_table.c:
+    #     print(c)
+    # association_table.create(engine,checkfirst=True)
+    # OdapDao.with_parents()
+    # # print(OdapDto.legacy)
+    pass
