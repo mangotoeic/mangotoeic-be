@@ -1,4 +1,4 @@
-﻿id,user_id,qId,timestamp,user_answer,answered_correctly,prior_question_elapsed_time,user_name,password,email
+﻿,user_id,qId,timestamp,user_answer,answered_correctly,prior_question_elapsed_time,user_name,password,email
 0,1,77,3482172842,3,1.0,13000.0,김지우,1,cuy39887@cuoly.com
 1,1,96,2077602636,3,1.0,48000.0,김지우,1,cuy39887@cuoly.com
 2,1,48,2315985867,0,1.0,11000.0,김지우,1,cuy39887@cuoly.com

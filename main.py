@@ -44,14 +44,14 @@ with app.app_context():
         LegacyDao.bulk()
 
     vocab_count = VocabDao.count()
-    print(f'***** Users Total Count is {vocab_count} *****')
+    print(f'***** Vocab Total Count is {vocab_count} *****')
     if vocab_count[0] == 0:
         VocabDao.bulk()
 
     user_count = UserDao.count()
     print(f'***** Users Total Count is {user_count} *****')
     if user_count[0] == 0:
-        UserDao.userdata_to_sql()
+        UserDao.bulk()
 
 
 initialize_routes(api)
