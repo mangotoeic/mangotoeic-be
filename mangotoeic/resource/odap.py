@@ -136,7 +136,7 @@ class Odaps(Resource):
 
     def post(self):
         body = request.get_json()
-        print(body)
+        # print(body)
         # df=pd.DataFrame.from_dict(body)
         OdapDao.add_odap2(body)
 
