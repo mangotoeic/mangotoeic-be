@@ -35,11 +35,8 @@ class OdapDto(db.Model):
     id: int = db.Column(db.Integer, primary_key=True, index=True)
     user_id: int = db.Column(db.Integer)
     qId: int = db.Column(db.Integer, db.ForeignKey('legacies.qId'))
-    legacy = db.relationship("LegacyDao", back_populates='odap')  
+    # legacy_id = db.relationship("LegacyDao", back_populates='odap')  
 
-    def __init__(self, user_id, qId):
-        self.user_id = user_id
-        self.qId = qId
     
     def __repr__(self):
         return f'user_id={self.user_id}, qId={self.qId}'
@@ -72,6 +69,17 @@ class OdapDao(OdapDto):
     def delete_odap(cls, userid, qId):
         del_odap = cls.query.filter(userid == userid, qId == qId).delete(qId)
         return del_odap
+    @classmethod
+    def add_odap2(cls,data):
+        user_id= data['user_id']
+        print(user_id)
+        for qid in data['qId']:
+            some_question=LegacyDto.query.filter_by(qId=qid).first()
+            print(some_question)
+        
+            x=OdapDto(user_id=user_id, legacy=some_question)
+            db.session.add(x)    
+        db.session.commit()
     
     @staticmethod   
     def bulk(data):
@@ -129,12 +137,17 @@ class Odaps(Resource):
     def post(self):
         body = request.get_json()
         print(body)
+<<<<<<< HEAD
         df=pd.DataFrame.from_dict(body)
         OdapDao.bulk(df)
 <<<<<<< HEAD
         # user = OdapDto(**body)
         # OdapDao.save(user)
 =======
+=======
+        # df=pd.DataFrame.from_dict(body)
+        OdapDao.add_odap2(body)
+>>>>>>> e430830f58068f178aa8bb1c43ce2a18c5238b4e
 
 >>>>>>> 12ca9573188537018f0410a5ceaf7646ff856cc5
         return {'id': "good"}, 200
