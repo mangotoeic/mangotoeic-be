@@ -134,15 +134,22 @@ class TestResultDao(TestResultDto):
     @staticmethod
     def add_testresult(data):
         print(data)
-        # user_id= data['user_id']
-        # print(user_id)
-        # for qid in data['qId']:
-        #     some_question=session.query(LegacyDto).filter_by(qId=qid).first()
-        #     print(some_question)
-        
-        #     x=TestResultDto(user_id=user_id, legacy2=some_question)
-        #     db.session.add(x)    
-        # db.session.commit()
+        user_id= data['user_id']
+        timestamp = data['timestamp']
+        prior_question_elapsed_time = data['prior_question_elapsed_time']
+        answered_correctly = data['answered_correctly']
+        user_answer = data['user_answer']
+        print(user_id)
+        for idx ,qid in enumerate(data['qId']):
+            some_question=LegacyDto.query.filter_by(qId=qid).first()
+            print(some_question)
+
+            x=TestResultDto(user_id=user_id, timestamp=timestamp[idx], \
+                prior_question_elapsed_time=prior_question_elapsed_time[idx], \
+                    answered_correctly=answered_correctly[idx], user_answer=user_answer[idx],\
+                        legacy2=some_question)
+            db.session.add(x)    
+        db.session.commit()
 
     # @staticmethod
     # def modify_user(user):
