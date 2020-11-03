@@ -156,7 +156,7 @@ class Legacy(Resource):
     @staticmethod
     def delete():
         args = parser.parse_args()
-        print(f'USer {args["id"]} deleted')
+        print(f'User {args["id"]} deleted')
         return {'code' : 0, 'message' : 'SUCCESS'}, 200
 
 class Legacies(Resource):
