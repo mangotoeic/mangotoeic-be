@@ -48,7 +48,7 @@ class  LegacyDto(db.Model):
     ansC = db.Column(db.CHAR(255))
     ansD = db.Column(db.CHAR(255))
     answer = db.Column(db.CHAR(255))
-
+    odap = db.relationship("OdapDto", backref='legacy')
     def __init__(self, qId, question, ansA , ansB, ansC,ansD ,answer):
         self.qId = qId
         self.question = question
@@ -60,7 +60,7 @@ class  LegacyDto(db.Model):
         
         
     def __repr__(self):
-        return f'legacies(id={self.id},ansA={self.ansA},ansB={self.ansB},ansC={self.ansC},ansD={self.ansD},answer={self.answer},question={self.question},qId ={self.qId})'
+        return f'legacies(ansA={self.ansA},ansB={self.ansB},ansC={self.ansC},ansD={self.ansD},answer={self.answer},question={self.question},qId ={self.qId})'
 
 
         
@@ -173,4 +173,5 @@ if __name__ == '__main__':
     # prepro = LegacyPro()
     # prepro.hook()
     input_table = LegacyDao
-    input_table.bulk()
+    input_table.with_parents()
+    
