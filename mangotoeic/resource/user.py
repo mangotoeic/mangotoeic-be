@@ -1,3 +1,4 @@
+from flask.globals import session
 import pandas as pd
 from flask import request
 from flask_restful import Resource, reqparse
@@ -17,81 +18,45 @@ class UserDto(db.Model):
     __tablename__ = 'users'
     __table_args__={'mysql_collate':'utf8_general_ci'}
 
-    id = db.Column(db.Integer, primary_key=True, index=True)
-    user_id = db.Column(db.Integer)
-    timestamp = db.Column(db.Integer)
+    # id = db.Column(db.Integer, primary_key=True, index=True)
+    user_id = db.Column(db.Integer, primary_key=True, index=True)
     user_name = db.Column(db.String(20))
     password = db.Column(db.String(20))
-    qId = db.Column(db.Integer)
-    user_answer = db.Column(db.Integer)
-    answered_correctly = db.Column(db.Float)
-    prior_question_elapsed_time = db.Column(db.Float)
     email = db.Column(db.String(20))
+    odap = db.relationship("OdapDto", backref='user',lazy=True)
 
-    def __init__(self, user_id=0, user_name='', password='', qId=0, user_answer=0, answered_correctly=0.0, prior_question_elapsed_time=0.0, email='', timestamp=0):
-        self.id = id
-        self.timestamp = timestamp
+    def __init__(self, user_id=0, user_name='', password='', email=''):
         self.user_id = user_id
         self.user_name = user_name
         self.password = password
-        self.qId = qId
-        self.user_answer = user_answer
-        self.answered_correctly = answered_correctly
-        self.prior_question_elapsed_time = prior_question_elapsed_time
         self.email = email
 
     def __repr__(self):
-        return f'user_id={self.user_id}, user_name={self.user_name} password={self.password}, qId={self.qId},\
-                user_answer={self.user_answer}, answered_correctly={self.answered_correctly},\
-                prior_question_elapsed_time={self.prior_question_elapsed_time}, email={self.email}'
+        return f'user_id={self.user_id}, user_name={self.user_name} password={self.password}, email={self.email}'
 
 
     @property
     def json(self):
         return {
-            'id' : self.id,
-            'timestamp' : self.timestamp,
             'user_id' : self.user_id,
             'user_name' : self.user_name,
             'password' : self.password,
-            'qId' : self.qId,
-            'user_answer' : self.user_answer,
-            'answered_correctly': self.answered_correctly,
-            'prior_question_elapsed_time': self.prior_question_elapsed_time,
             'email': self.email
         }
         
-        
-    def save(self):
-        Session = openSession()
-        session = Session()
-        newUser = UserDto(user_id = user['user_id'], 
-                                email = user['email'], 
-                                password = user['password'])
-        session.add(newUser)
-        session.commit()
 
-    @classmethod
-    def delete(cls):
-        Session = openSession()
-        session = Session()
-        data = cls.query.get(user_id)
-        session.delete(data)
-        session.commit()
-
-
-class UserVo:
-    id : int = 0
-    timestamp: int = 0
-    password: str = ''
-    email: str = ''
-    user_name : str = ''
-    user_id : int = 0
-    qId : int = 0
-    user_answer : int = 0
-    answered_correctly : float = 0.0
-    prior_question_elapsed_time : float = 0.0
-    email : str = ''
+# class UserVo:
+#     id : int = 0
+#     timestamp: int = 0
+#     password: str = ''
+#     email: str = ''
+#     user_name : str = ''
+#     user_id : int = 0
+#     qId : int = 0
+#     user_answer : int = 0
+#     answered_correctly : float = 0.0
+#     prior_question_elapsed_time : float = 0.0
+#     email : str = ''
     
 
 class UserDao(UserDto):
@@ -99,12 +64,15 @@ class UserDao(UserDto):
     def __init__(self):
         pass
 
-    @classmethod
-    def userdata_to_sql(cls):
-        df = pd.read_csv(os.path.join( basedir,'data/user_table_prepro3.csv')) # 정제된 데이터로 변경 예정
-        db.engine.execute("DROP TABLE IF EXISTS users;")
-        df.to_sql(name='users', con=db.engine.connect(), index=False)
-        engine.connect().close()
+    @staticmethod
+    def bulk():
+        Session = openSession()
+        session = Session()
+        df = pd.read_csv('./mangotoeic/resource/data/userlist.csv')
+        session.bulk_insert_mappings(UserDto, df.to_dict(orient="records"))
+        session.commit()
+        session.close()
+
 
     @classmethod
     def find_all(cls):
@@ -141,8 +109,10 @@ class UserDao(UserDto):
         db.session.commit()
 
     def update_user(self, userid, column, value):
-        self.session.query(UserDto).filter(UserDto.user_id == userid).update({column : value})
-        self.session.commit()
+        Session = openSession()
+        session = Session()
+        session.query(UserDto).filter(UserDto.user_id == userid).update({column : value})
+        session.commit()
 
     @staticmethod
     def modify_user(user):
@@ -190,24 +160,24 @@ class User(Resource):
         # except:
         #     return {'message': 'An error occured inserting the user'}, 500
 
-    @staticmethod
-    def get(email):
-        print(f'User {email} added ')
-        try:
-            user = UserDao.find_by_id(id)
-            if user:
-                return user.json()
-        except:
-            return {'message': 'User not found'}, 404
+    # @staticmethod
+    # def get(email):
+    #     print(f'User {email} added ')
+    #     try:
+    #         user = UserDao.find_by_id(id)
+    #         if user:
+    #             return user.json()
+    #     except:
+    #         return {'message': 'User not found'}, 404
 
-    def put(self, id):
-        data = User.parser.parse_args()
-        user = User.find_by_id(id)
+    # def put(self, id):
+    #     data = User.parser.parse_args()
+    #     user = User.find_by_id(id)
 
-        user.user_id = data['user_id']
-        user.email = data['email']
-        user.save()
-        return user.json()
+    #     user.user_id = data['user_id']
+    #     user.email = data['email']
+    #     user.save()
+    #     return user.json()
 
 class Users(Resource):
     @staticmethod
@@ -251,18 +221,18 @@ class Access(Resource):
     def post(self):
         print('========== 6 ==========')
         args = parser.parse_args()
-        user = UserVo()
+        user = UserDto()
         user.password = args.password
         user.email = args.email
         data = UserDao.login(user)
         return data[0], 200
 
 
-if __name__ == "__main__":
-    userdao = UserDao()
-    userdao.userdata_to_sql()
+# if __name__ == "__main__":
+#     userdao = UserDao()
+#     userdao.userdata_to_sql()
     # userdao.add_user('444', 9834, 3, 1, 39000)
     # userdao.delete_user('115')        
-    # userdao.update_user(16, 'email', 'kim')
+    # userdao.update_user(1, 'user_name', '박지성')
     # userdao.update_user(user_id_loop, names_loop)
     # a = userdao.fetch_user('666')

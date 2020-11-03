@@ -48,7 +48,8 @@ class  LegacyDto(db.Model):
     ansC = db.Column(db.CHAR(255))
     ansD = db.Column(db.CHAR(255))
     answer = db.Column(db.CHAR(255))
-
+    odap = db.relationship("OdapDto", backref='legacy',lazy=True)
+    testresult = db.relationship("TestResultDto", backref='legacy2',lazy=True)
     def __init__(self, qId, question, ansA , ansB, ansC,ansD ,answer):
         self.qId = qId
         self.question = question
@@ -60,7 +61,7 @@ class  LegacyDto(db.Model):
         
         
     def __repr__(self):
-        return f'legacies(id={self.id},ansA={self.ansA},ansB={self.ansB},ansC={self.ansC},ansD={self.ansD},answer={self.answer},question={self.question},qId ={self.qId})'
+        return f'legacies(ansA={self.ansA},ansB={self.ansB},ansC={self.ansC},ansD={self.ansD},answer={self.answer},question={self.question},qId ={self.qId})'
 
 
         
@@ -155,7 +156,7 @@ class Legacy(Resource):
     @staticmethod
     def delete():
         args = parser.parse_args()
-        print(f'USer {args["id"]} deleted')
+        print(f'User {args["id"]} deleted')
         return {'code' : 0, 'message' : 'SUCCESS'}, 200
 
 class Legacies(Resource):
@@ -173,4 +174,5 @@ if __name__ == '__main__':
     # prepro = LegacyPro()
     # prepro.hook()
     input_table = LegacyDao
-    input_table.bulk()
+    input_table.with_parents()
+    
