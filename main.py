@@ -2,11 +2,11 @@ from flask import Flask, request
 from flask_restful import Api
 from mangotoeic.ext.db import url, db
 from mangotoeic.ext.routes import initialize_routes
-from mangotoeic.resource.user import User, Users
 from mangotoeic.resource.legacy import LegacyDao 
 from mangotoeic.resource.vocab import VocabDao 
 from flask_cors import CORS
 from mangotoeic.resource.user import User, Users, UserDto, UserDao
+from mangotoeic.resource.testresult import TestResultDao, TestResultDto, TestResult
 from mangotoeic.review.api import Review, Reviews
 import json
 
@@ -53,5 +53,9 @@ with app.app_context():
     if user_count[0] == 0:
         UserDao.bulk()
 
+    testresult_count = TestResultDao.count()
+    print(f'***** TestResult Total Count is {testresult_count} *****')
+    if testresult_count[0] == 0:
+        TestResultDao.bulk()
 
 initialize_routes(api)
