@@ -9,6 +9,7 @@ from mangotoeic.ext.db import db, openSession, engine
 from mangotoeic.ext.db import Base
 import json
 from mangotoeic.resource.user import UserDto
+from mangotoeic.resource.legacy import LegacyDto
 
 # 토익 시험 몇번 봤는지, 목표점수, 시험날짜, 본인의 영어실력 입력
 # 데이터 베이스에 반영할 건지?
@@ -21,19 +22,19 @@ class TestResultDto(db.Model):
     #userid: int = db.Column(db.Integer, db.ForeignKey(UserDto.user_id))
     user_id = db.Column(db.Integer, db.ForeignKey(UserDto.user_id))
     timestamp = db.Column(db.Float)
-    qId = db.Column(db.Integer)
+    qId: int = db.Column(db.Integer, db.ForeignKey('legacies.qId'))
     user_answer = db.Column(db.Integer)
     answered_correctly = db.Column(db.Float)
     prior_question_elapsed_time = db.Column(db.Float)
 
-    def __init__(self, id=0, user_id=0, qId=0, user_answer=0, answered_correctly=0.0, prior_question_elapsed_time=0.0, timestamp=0):
-        self.id = id
-        self.timestamp = timestamp
-        self.user_id = user_id
-        self.qId = qId
-        self.user_answer = user_answer
-        self.answered_correctly = answered_correctly
-        self.prior_question_elapsed_time = prior_question_elapsed_time
+    # def __init__(self, id=0, user_id=0, qId=0, user_answer=0, answered_correctly=0.0, prior_question_elapsed_time=0.0, timestamp=0):
+    #     self.id = id
+    #     self.timestamp = timestamp
+    #     self.user_id = user_id
+    #     self.qId = qId
+    #     self.user_answer = user_answer
+    #     self.answered_correctly = answered_correctly
+    #     self.prior_question_elapsed_time = prior_question_elapsed_time
 
     def __repr__(self):
         return f'user_id={self.user_id}, qId={self.qId},\
@@ -130,6 +131,19 @@ class TestResultDao(TestResultDto):
         session.query(UserDto).filter(UserDto.user_id == userid).update({column : value})
         session.commit()
 
+    @staticmethod
+    def add_testresult(data):
+        print(data)
+        # user_id= data['user_id']
+        # print(user_id)
+        # for qid in data['qId']:
+        #     some_question=session.query(LegacyDto).filter_by(qId=qid).first()
+        #     print(some_question)
+        
+        #     x=TestResultDto(user_id=user_id, legacy2=some_question)
+        #     db.session.add(x)    
+        # db.session.commit()
+
     # @staticmethod
     # def modify_user(user):
     #     Session = openSession()
@@ -198,17 +212,26 @@ class TestResult(Resource):
 class TestResults(Resource):
     @staticmethod
     def post():
-        args = parser.parse_args()
-        print(f'User {args["id"]} added ')
-        params = json.loads(request.get_data(), encoding='utf-8')
-        if len(params) == 0:
+        body = request.get_json()
+        print(body)
+        # df=pd.DataFrame.from_dict(body)
+        TestResultDao.add_testresult(body)
 
-            return 'No parameter'
+        return {'id': "good"}, 200
 
-        params_str = ''
-        for key in params.keys():
-            params_str += 'key: {}, value: {}<br>'.format(key, params[key])
-        return {'code':0, 'message': 'SUCCESS'}, 200
+
+    # def post():
+    #     args = parser.parse_args()
+    #     print(f'User {args["id"]} added ')
+    #     params = json.loads(request.get_data(), encoding='utf-8')
+    #     if len(params) == 0:
+
+    #         return 'No parameter'
+
+    #     params_str = ''
+    #     for key in params.keys():
+    #         params_str += 'key: {}, value: {}<br>'.format(key, params[key])
+    #     return {'code':0, 'message': 'SUCCESS'}, 200
 
     @staticmethod
     def get(id: str):

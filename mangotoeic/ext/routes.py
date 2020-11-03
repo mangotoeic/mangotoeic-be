@@ -27,6 +27,7 @@ auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 access = Blueprint('access', __name__, url_prefix='/api/access')
 
 testresult = Blueprint('testresult', __name__, url_prefix='/api/testresult')
+testresults = Blueprint('testresult', __name__, url_prefix='/api/testresults')
 
 
 api = Api(legacy)
@@ -40,6 +41,7 @@ api = Api(users)
 api = Api(access)
 api = Api(auth)
 api = Api(testresult)
+api = Api(testresults)
 
 def initialize_routes(api):
     api.add_resource(Home, '/api')
