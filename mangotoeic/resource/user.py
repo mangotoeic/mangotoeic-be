@@ -23,6 +23,7 @@ class UserDto(db.Model):
     user_name = db.Column(db.String(20))
     password = db.Column(db.String(20))
     email = db.Column(db.String(20))
+    odap = db.relationship("OdapDto", backref='user',lazy=True)
 
     def __init__(self, user_id=0, user_name='', password='', email=''):
         self.user_id = user_id
