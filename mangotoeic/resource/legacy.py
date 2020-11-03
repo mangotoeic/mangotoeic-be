@@ -49,6 +49,7 @@ class  LegacyDto(db.Model):
     ansD = db.Column(db.CHAR(255))
     answer = db.Column(db.CHAR(255))
     odap = db.relationship("OdapDto", backref='legacy',lazy=True)
+    testresult = db.relationship("TestResultDto", backref='legacy2',lazy=True)
     def __init__(self, qId, question, ansA , ansB, ansC,ansD ,answer):
         self.qId = qId
         self.question = question

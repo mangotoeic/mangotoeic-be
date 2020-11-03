@@ -10,6 +10,7 @@ from mangotoeic.resource.newq import NewQ , NewQs
 from mangotoeic.resource.recommendation import Recommendation
 from mangotoeic.resource.odap import Odap, Odaps
 from mangotoeic.resource.vocab import Vocab, Vocabs
+from mangotoeic.resource.testresult import TestResult, TestResults
 
 legacies = Blueprint('legacies', __name__, url_prefix='/api/legacies')
 legacy = Blueprint('legacy', __name__, url_prefix='/api/legacy')
@@ -25,6 +26,10 @@ users = Blueprint('users', __name__, url_prefix='/api/users')
 auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 access = Blueprint('access', __name__, url_prefix='/api/access')
 
+testresult = Blueprint('testresult', __name__, url_prefix='/api/testresult')
+testresults = Blueprint('testresults', __name__, url_prefix='/api/testresults')
+
+
 api = Api(legacy)
 api = Api(legacies)
 api = Api(odaps)
@@ -35,6 +40,8 @@ api = Api(user)
 api = Api(users)
 api = Api(access)
 api = Api(auth)
+api = Api(testresult)
+api = Api(testresults)
 
 def initialize_routes(api):
     api.add_resource(Home, '/api')
@@ -50,6 +57,8 @@ def initialize_routes(api):
     api.add_resource(Vocab, '/api/vocab')
     api.add_resource(Access, '/api/access')
     api.add_resource(Auth, '/api/auth')
+    api.add_resource(TestResult, '/api/testresult')
+    api.add_resource(TestResults, '/api/testresults')
     
 @legacy.errorhandler(500)
 def legacy_api_error(e):
