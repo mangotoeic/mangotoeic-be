@@ -136,24 +136,10 @@ class Odaps(Resource):
 
     def post(self):
         body = request.get_json()
-<<<<<<< HEAD
-        print(body)
-<<<<<<< HEAD
-        df=pd.DataFrame.from_dict(body)
-        OdapDao.bulk(df)
-<<<<<<< HEAD
-        # user = OdapDto(**body)
-        # OdapDao.save(user)
-=======
-=======
-=======
         # print(body)
->>>>>>> 2fdaf5e9dc90a1f4f78dfb37ef9a799d2f41a510
         # df=pd.DataFrame.from_dict(body)
         OdapDao.add_odap2(body)
->>>>>>> e430830f58068f178aa8bb1c43ce2a18c5238b4e
 
->>>>>>> 12ca9573188537018f0410a5ceaf7646ff856cc5
         return {'id': "good"}, 200
     
     #{'user_id': None, 'qId': [2, 3, 4]}
