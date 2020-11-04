@@ -38,7 +38,7 @@ class LegacyPro:
         print(df)
         return df
 
-class  LegacyDto(db.Model):
+class LegacyDto(db.Model):
     __tablename__ ="legacies"
     __table_args__={'mysql_collate':'utf8_general_ci'}
     qId = db.Column(db.Integer, primary_key = True, index = True)
@@ -174,3 +174,5 @@ if __name__ == '__main__':
     # prepro.hook()
     input_table = LegacyDao
     input_table.bulk()
+
+    

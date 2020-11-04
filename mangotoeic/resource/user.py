@@ -1,3 +1,4 @@
+from enum import unique
 from flask.globals import session
 import pandas as pd
 from flask import request
@@ -28,6 +29,7 @@ class UserDto(db.Model):
     answered_correctly = db.Column(db.Float)
     prior_question_elapsed_time = db.Column(db.Float)
     email = db.Column(db.String(20))
+
 
     def __init__(self, user_id=0, user_name='', password='', qId=0, user_answer=0, answered_correctly=0.0, prior_question_elapsed_time=0.0, email='', timestamp=0):
         self.id = id
