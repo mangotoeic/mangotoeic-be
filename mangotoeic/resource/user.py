@@ -24,12 +24,6 @@ class UserDto(db.Model):
     password = db.Column(db.String(20))
     email = db.Column(db.String(20))
 
-    def __init__(self, user_id=0, user_name='', password='', email=''):
-        self.user_id = user_id
-        self.user_name = user_name
-        self.password = password
-        self.email = email
-
     def __repr__(self):
         return f'user_id={self.user_id}, user_name={self.user_name} password={self.password}, email={self.email}'
 
