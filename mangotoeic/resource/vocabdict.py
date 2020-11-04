@@ -24,6 +24,9 @@ class VocabdictPro:
             data2 = pickle.load(f)
         with open(self.fpath3, 'rb') as f:
             data3 = pickle.load(f)
+        vlist = ([str(elem) for elem in data.values()])
+        vlist2 = ([str(elem) for elem in data2.values()])
+        vlist3 = ([str(elem) for elem in data3.values()])
         df = pd.DataFrame.from_dict(data, orient='index')
         df2 = pd.DataFrame.from_dict(data2, orient='index')
         df3 = pd.DataFrame.from_dict(data3, orient='index')
@@ -39,9 +42,8 @@ class VocabdictDto(db.Model):
     __tablename__ = 'vocabdict'
     __table_args__={'mysql_collate':'utf8_general_ci'}
 
-    vocab = db.Column(db.String(50), primary_key=True)
+    vocab = db.Column(db.String(50), db.ForeignKey('vocablist.vocab'))
     meaning = db.Column(db.JSON)
-    vocabs = db.relationship("VocabDto", backref='vocabdict',lazy=True)
 
     def __init__(self, vocab, meaning):
         self.vocab = vocab
