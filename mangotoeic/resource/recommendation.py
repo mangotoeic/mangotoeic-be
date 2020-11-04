@@ -3,21 +3,20 @@ from mangotoeic.ext.db import db ,openSession
 from typing import List
 from flask_restful import Resource, reqparse
 from sqlalchemy import func
-
+import os
+basedir = os.path.dirname(os.path.abspath(__file__))     
 class RecommendationPro:
     def __init__(self):
         ...
     def read_csv(self):
-        df=pd.read_csv("./data/realdata.csv")
+        df=pd.read_csv(os.path.join(basedir, "./data/realdata.csv"))
         return df
     def hook(self):
         df=self.read_csv()
         df=self.prepro(df)
         return df
     def prepro(self,df):
-        
         print(df)
-        
         df= df.rename(index={0:'id'},columns={'answered_correctly': "correctAvg"})
         print(df)
         return df
@@ -75,8 +74,13 @@ class RecommendationDao(RecommendationDto):
         Session = openSession()
         session = Session()
         return session.query(func.count(RecommendationDto.qId)).one()
-    
-
+    @staticmethod
+    def pivot_table_build():
+        Session =openSession()
+        session =Session()
+        q=session.query(RecommendationDto)
+        df= pd.read_sql(q.statement,q.session.bind)
+        print(df)
 class Recommendation(Resource):
     def __init__(self):
         parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
@@ -91,3 +95,7 @@ class Recommendation(Resource):
 class Recommendations(Resource):
     def get(self):
         ...
+if __name__ == '__main__':
+    recommend = RecommendationDao()
+    recommend.pivot_table_build()
+    
