@@ -1,4 +1,15 @@
 {
+<<<<<<< HEAD
     "python.pythonPath": "C:\\Users\\jongm\\anaconda3\\envs\\tensorflow\\python.exe",
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    "python.pythonPath": "/Users/kwonhyunah/opt/anaconda3/envs/tensorflow/bin/python",
+>>>>>>> master
+=======
+    "python.pythonPath": "/Users/kwonhyunah/opt/anaconda3/envs/new/bin/python",
+>>>>>>> master
+>>>>>>> master
     "python.dataScience.jupyterServerURI": "local"
 }
