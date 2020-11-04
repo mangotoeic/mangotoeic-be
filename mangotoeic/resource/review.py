@@ -468,11 +468,11 @@ class Review(Resource):
             return {'message' : ' an error occured while inserting review'}, 500 
 
     @staticmethod
-    def get(email):
+    def get(review_content):
         try:
-            review = ReviewDao.find_by_email(email)
+            review = ReviewDao.find_by_review(review_content)
             if review:
-                return review.json()
+                return review.json(), 200
         except Exception as e:
             return {'message': 'review not found'}, 404 
 
@@ -483,12 +483,22 @@ class Review(Resource):
         return {'code' :0, 'message' : 'Success'}, 200
 
     @staticmethod
-    def delete():
+    def delete(id: int):
         args = parser.parse_args()
         print(f'Review posted by {args.email} deleted')
+        ReviewDao.delete(args.id)
         return {'code' :0, 'message' : 'Success'}, 200
 
- 
+class ReviewSearchByEmail(Resource):
+       
+    @staticmethod
+    def get(writer):
+        try:
+            review = ReviewDao.find_by_email(writer)
+            if review:
+                return review.json(), 200
+        except Exception as e:
+            return {'message': 'review not found'}, 404 
 
 class Reviews(Resource): 
 
@@ -501,4 +511,6 @@ class Reviews(Resource):
     def post():
         rd = ReviewDao()
         rd.insert_many('reviews')
-        
+
+
+
