@@ -6,7 +6,7 @@ class MinitestDto(db.Model):
     __tablename__ = "minitest"
     __table_args__ = {'mysql_collate':'utf8_general_ci'}
     groupNum: int = db.Column(db.Integer, primary_key=True, index=True)
-    qId: int = db.Column(db.Integer)
+    qId: int = db.Column(db.Integer, db.ForeignKey('legacies.qId'))
 
     # user_id : str = db.Column(db.String(30), db.ForeignKey("UserDto.user_id"))
 
