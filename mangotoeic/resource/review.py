@@ -93,14 +93,11 @@ class Prepro():
     def get_data(self): 
         reader = self.reader
         reader.context = os.path.join(basedir, 'data')
-        reader.fname = "앱리뷰csv파일.csv"
+        reader.fname = "앱리뷰csv파일2.csv"
         reader.new_file()
         review_data = reader.csv_to_dframe()
-
-        review_data['user_id'] = ''
-        review_data = review_data[ ['user_id'] + [ col for col in review_data.columns if col != 'user_id' ] ]
-        
-        return review_data.iloc[10409:12400,:]
+ 
+        return review_data.iloc[10409:12409,:]
 
 
     @staticmethod
