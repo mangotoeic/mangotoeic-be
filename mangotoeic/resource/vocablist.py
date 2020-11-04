@@ -21,4 +21,4 @@ class VocablistDto(db.Model):
     # id = db.Column(db.Integer,primary_key=True, index=True)
     vocab = db.Column(db.String(50),primary_key=True)
     # vocabs = db.relationship("VocabDto", backref='vocablist2',lazy=True)
-    vocabs2 = db.relationship("VocabdictDto", backref='vocablist',lazy=True)
+    # vocabs2 = db.relationship("VocabdictDto", backref='vocablist',lazy=True)  
