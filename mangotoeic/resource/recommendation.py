@@ -2,6 +2,8 @@ import pandas as pd
 from mangotoeic.ext.db import db ,openSession
 from typing import List
 from flask_restful import Resource, reqparse
+from sqlalchemy import func
+
 class RecommendationPro:
     def __init__(self):
         ...
@@ -28,12 +30,6 @@ class  RecommendationDto(db.Model):
     user_id = db.Column(db.Integer)
     correctAvg = db.Column(db.Float)
     
-    def __init__(self,id, qId, user_id,correctAvg):
-        self.id = id
-        self.qId = qId
-        self.user_id = user_id
-        self.correctAvg = correctAvg
-
     def __repr__(self):
         return f'recommendation(id={self.id},qId={self.qId},user_id={self.user_id},correctAvg={self.correctAvg})'
 
@@ -56,7 +52,7 @@ class RecommendationDao(RecommendationDto):
     def find_by_id(cls, id):
         return cls.query.filter_by(id == id).first()
     @staticmethod   
-    def insert_many():
+    def bulk():
         service = RecommendationPro()
         Session = openSession()
         session = Session()
@@ -74,6 +70,12 @@ class RecommendationDao(RecommendationDto):
         data = cls.query.get(id)
         db.session.delete(data)
         db.session.commit()
+    @staticmethod
+    def count():
+        Session = openSession()
+        session = Session()
+        return session.query(func.count(RecommendationDto.qId)).one()
+    
 
 class Recommendation(Resource):
     def __init__(self):

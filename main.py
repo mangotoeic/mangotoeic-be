@@ -10,8 +10,6 @@ from mangotoeic.resource.user import User, Users, UserDto, UserDao
 from mangotoeic.resource.testresult import TestResultDao, TestResultDto, TestResult
 from mangotoeic.resource.vocabdict import VocabdictDto
 from mangotoeic.resource.vocablist import VocablistDto
-
-
 import json
 
 app = Flask(__name__)
@@ -66,6 +64,10 @@ with app.app_context():
     print(f'***** Review Total Count is {review_count} *****')
     if review_count[0] == 0 :
         ReviewDao.insert_many()
+    vocab_count = VocabDao.count()
+    print(f'***** Vocab Total Count is {vocab_count} *****')
+    if review_count[0] == 0 :
+        VocabDao.bulk()
 
 initialize_routes(api)
  
