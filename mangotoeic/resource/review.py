@@ -271,7 +271,7 @@ class WebCrawler():
     def get_data(self):
         reader = self.reader
         reader.context = basedir
-        reader.fname = "앱리뷰csv파일.csv"
+        reader.fname = "앱리뷰csv파일2.csv"
         newfile=reader.new_file()
         review_data = reader.csv_to_dframe(newfile)
         return review_data.head(5)
