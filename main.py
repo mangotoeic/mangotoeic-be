@@ -8,7 +8,6 @@ from flask_cors import CORS
 from mangotoeic.resource.review import ReviewDao
 from mangotoeic.resource.user import User, Users, UserDto, UserDao
 from mangotoeic.resource.testresult import TestResultDao, TestResultDto, TestResult
-from mangotoeic.review.api import Review, Reviews
 import json
 
 app = Flask(__name__)
