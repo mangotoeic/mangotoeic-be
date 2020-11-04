@@ -4,6 +4,7 @@ from mangotoeic.ext.db import db, openSession
 from flask_restful import Resource, reqparse
 import pickle
 import os
+from mangotoeic.resource.vocablist import VocablistDto
 basedir= os.path.dirname(os.path.abspath(__file__))
 
 class VocabdictPro:
@@ -41,14 +42,11 @@ class VocabdictDto(db.Model):
     
     __tablename__ = 'vocabdict'
     __table_args__={'mysql_collate':'utf8_general_ci'}
-
+    id = db.Column(db.Integer, primary_key=True ,index= True)
     vocab = db.Column(db.String(50), db.ForeignKey('vocablist.vocab'))
-    meaning = db.Column(db.JSON)
+    meaning = db.Column(db.String(300))
 
-    def __init__(self, vocab, meaning):
-        self.vocab = vocab
-        self.meaning = meaning
-    
+
     def __repr__(self):
         return f' vocab={self.vocab}, meaning={self.meaning}'
     
@@ -74,6 +72,14 @@ class VocabdictDao(VocabdictDto):
         session.bulk_insert_mappings(VocabdictDto, df.to_dict(orient="records"))
         session.commit()
         session.close()
+    @staticmethod
+    def bulk2():
+        with open('./data/vocabdict.pickle', 'rb') as f:
+            data = pickle.load(f)
+        with open('./data/vocabdict2.pickle', 'rb') as f:
+            data2 = pickle.load(f)
+        with open('./data/vocabdict3.pickle', 'rb') as f:
+            data3 = pickle.load(f)
 
 parser = reqparse.RequestParser()
 parser.add_argument('vocab', type=str, required=True,
