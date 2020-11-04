@@ -1,7 +1,7 @@
 import pandas as pd
 import json
 from mangotoeic.ext.db import db, openSession
-from mangotoeic.resource.minitest import MinitestDto
+from mangotoeic.resource.vocabdict import VocabdictDto
 from typing import List
 from flask import request, jsonify
 from flask_restful import Resource, reqparse
@@ -19,7 +19,7 @@ class VocabPro:
         return df
 
     def fileread(self):
-        df= pd.read_csv(self.fpath,index_col=False,)
+        df = pd.read_csv(self.fpath,index_col=False,)
         df = df.drop('Unnamed: 0', axis=1)
         df = df.rename(index ={0:'vocabId'})
         
@@ -31,17 +31,11 @@ class VocabDto(db.Model):
     __table_args__={'mysql_collate':'utf8_general_ci'}
 
     vocabId: int = db.Column(db.Integer, primary_key=True, index=True)
-    vocab: str = db.Column(db.String(50))
+    vocab: str = db.Column(db.String(50), db.ForeignKey('vocabdict.vocab'))
     user_id: int = db.Column(db.Integer)
     # db.ForeignKey(MinitestDto.qId)
     correctAvg : float = db.Column(db.Float)
 
-    def __init__(self, user_id, vocabId, vocab, qId,correctAvg):
-        self.user_id = user_id
-        self.vocabId = vocabId
-        self.vocab = vocab
-        self.correctAvg = correctAvg
-        
     def __repr__(self):
         return f' user_id={self.user_id}, vocabId={self.vocabId}, vocab={self.vocab},correctAvg={self.correctAvg}'
 

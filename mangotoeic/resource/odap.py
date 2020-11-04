@@ -36,22 +36,25 @@ class OdapDto(db.Model):
     id: int = db.Column(db.Integer, primary_key=True, index=True)
     user_id: int = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     qId: int = db.Column(db.Integer, db.ForeignKey('legacies.qId'))
+    bookmark: int = db.Column(db.Integer)
     # legacy_id = db.relationship("LegacyDao", back_populates='odap')  
 
     
     def __repr__(self):
-        return f'user_id={self.user_id}, qId={self.qId}'
+        return f'user_id={self.user_id}, qId={self.qId}, bookmark={self.bookmark}'
 
     @property
     def json(self):
         return {
             'user_id' : self.user_id,
-            'qId' : self.qId
+            'qId' : self.qId,
+            'bookmark': self.bookmark
         }
 
 class OdapVo:
     user_id: int = 0
     qId: int = 0
+    bookmark: int = 0
 
 class OdapDao(OdapDto):
     
@@ -112,6 +115,8 @@ parser.add_argument('user_id', type=int, required=True,
                                         help='This field should be a userid')
 parser.add_argument('qId', type=int, required=True,
                                         help='This field should be a qId')
+parser.add_argument('bookmark', type=int, required=True,
+                                        help='This field should be a qId')
 
 class Odap(Resource):
     @staticmethod    
@@ -120,7 +125,7 @@ class Odap(Resource):
         print(args)
         d=UserDto.query.filter_by(user_id=args['user_id']).first()
         print(d.odap)
-        bdict = {}
+        blist = []
         for idx, item in enumerate(d.odap):
             p = LegacyDto.query.filter_by(qId=item.qId).first()
             mydict = {'question': p.question, 
@@ -129,9 +134,10 @@ class Odap(Resource):
             'ansC': p.ansC,
             'ansD': p.ansD,
             'answer': p.answer}
-            bdict[idx] = mydict
+            blist.append(mydict)
+        print(blist)
 
-        return bdict , 200
+        return blist , 200
     
     @staticmethod
     def update():
@@ -152,18 +158,10 @@ class Odaps(Resource):
 
     def post(self):
         body = request.get_json()
-<<<<<<< HEAD
-        print(body)
-        df=pd.DataFrame.from_dict(body)
-        OdapDao.bulk(df)
-        user = OdapDto(**body)
-        OdapDao.save(user)
-=======
         # print(body)
         # df=pd.DataFrame.from_dict(body)
         OdapDao.add_odap2(body)
 
->>>>>>> master
         return {'id': "good"}, 200
     
     #{'user_id': None, 'qId': [2, 3, 4]}
