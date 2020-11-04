@@ -7,7 +7,6 @@ import json
 from typing import List
 from flask import request, jsonify
 from flask_restful import Resource, reqparse
-from sqlalchemy.orm.collections import InstrumentedList as _InstrumentedList
 import os
 
 basedir= os.path.dirname(os.path.abspath(__file__))
