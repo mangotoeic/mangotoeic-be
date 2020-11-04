@@ -5,9 +5,9 @@ from mangotoeic.ext.routes import initialize_routes
 from mangotoeic.resource.legacy import LegacyDao 
 from mangotoeic.resource.vocab import VocabDao 
 from flask_cors import CORS
+from mangotoeic.resource.review import ReviewDao
 from mangotoeic.resource.user import User, Users, UserDto, UserDao
 from mangotoeic.resource.testresult import TestResultDao, TestResultDto, TestResult
-from mangotoeic.review.api import Review, Reviews
 import json
 
 app = Flask(__name__)
@@ -57,5 +57,11 @@ with app.app_context():
     print(f'***** TestResult Total Count is {testresult_count} *****')
     if testresult_count[0] == 0:
         TestResultDao.bulk()
+    
+    review_count = ReviewDao.count()
+    print(f'***** Review Total Count is {review_count} *****')
+    if review_count[0] == 0 :
+        ReviewDao.insert_many()
 
 initialize_routes(api)
+ 

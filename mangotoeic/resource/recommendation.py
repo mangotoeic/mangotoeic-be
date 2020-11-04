@@ -24,7 +24,7 @@ class  RecommendationDto(db.Model):
     __tablename__ ="recommendation"
     __table_args__={'mysql_collate':'utf8_general_ci'}
     id = db.Column(db.Integer, primary_key =True, index = True)
-    qId= db.Column(db.Integer)
+    qId: int = db.Column(db.Integer, db.ForeignKey('legacies.qId'))
     user_id = db.Column(db.Integer)
     correctAvg = db.Column(db.Float)
     
