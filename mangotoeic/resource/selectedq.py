@@ -20,16 +20,20 @@ class SelectedQPro:
         df= pd.read_csv(self.fpath)
         return df
     def filerename(self,df):
+        print(df)
         df=df.set_index(['selected_qid'])
         df["percent_to_selected"]=0
         df=df.drop(columns=["Unnamed: 0"],axis=1)
+        df=df.reset_index()
+        df.index.names=['id']
         print(df)
         return df
         
 class  SelectedQDto(db.Model):
     __tablename__ ="selectedq"
     __table_args__={'mysql_collate':'utf8_general_ci'}
-    selected_qid = db.Column(db.Integer, primary_key = True, index = True)
+    id =db.Column(db.Integer, primary_key = True, index = True)
+    selected_qid = db.Column(db.Integer, db.ForeignKey('legacies.qId'))
     percent_to_selected =db.Column(db.Integer)
 
 class SelectedQDao(SelectedQDto):
