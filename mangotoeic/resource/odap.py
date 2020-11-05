@@ -122,13 +122,7 @@ class Odap(Resource):
         blist = []
         for idx, item in enumerate(d.odap):
             p = LegacyDto.query.filter_by(qId=item.qId).first()
-            mydict = {'question': p.question, 
-            'ansA': p.ansA,
-            'ansB': p.ansB,
-            'ansC': p.ansC,
-            'ansD': p.ansD,
-            'answer': p.answer}
-            blist.append(mydict)
+            blist.append(p.json)
 
         return blist , 200
     
