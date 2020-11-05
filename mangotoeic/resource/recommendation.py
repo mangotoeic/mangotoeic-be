@@ -80,6 +80,8 @@ class RecommendationDao(RecommendationDto):
         session =Session()
         q=session.query(RecommendationDto)
         df= pd.read_sql(q.statement,q.session.bind)
+        df_pivot= df.pivot(index="user_id", columns='qId', values='correctAvg')
+        print(df_pivot)
         print(df)
 class Recommendation(Resource):
     def __init__(self):
