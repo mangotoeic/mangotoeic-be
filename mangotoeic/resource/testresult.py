@@ -176,7 +176,8 @@ class TestResults(Resource):
         # df=pd.DataFrame.from_dict(body)
         TestResultDao.add_testresult(body)
         TestResultDao.get_average()
-        return {'id': "good"}, 200
+        data=TestResultDto.query.filter_by(user_id=body['user_id']).first()
+        return data.user_avg, 200
 
 
     # def post():
