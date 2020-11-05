@@ -4,6 +4,7 @@ from mangotoeic.ext.db import db, openSession
 from flask_restful import Resource, reqparse
 import pickle
 import os
+import numpy as np
 # from mangotoeic.resource.vocablist import VocablistDto
 basedir= os.path.dirname(os.path.abspath(__file__))
 
@@ -14,9 +15,8 @@ class VocabdictPro:
         self.fpath3 = os.path.join(basedir, './data/vocabdict3.pickle')
     
     def hook(self):
-        df=self.fileread()
-        print(df.head())
-        return df
+        mylist=self.fileread()
+        return mylist
     
     def fileread(self):
         with open(self.fpath, 'rb') as f:
@@ -34,15 +34,16 @@ class VocabdictPro:
         df = df.append(df2)
         df = df.append(df3)
         # print(df)
-        df.to_csv(os.path.join(basedir, './data/dfcsv.csv'))
-
-        return df
+        mylist=[]
+        df.apply(lambda x: mylist.append(x))
+        
+        return mylist
 
 class VocabdictDto(db.Model):
     
     __tablename__ = 'vocabdict'
     __table_args__={'mysql_collate':'utf8_general_ci'}
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, index=True)
     vocab = db.Column(db.String(50))
     meaning = db.Column(db.String(300))
 
@@ -67,37 +68,22 @@ class VocabdictDao(VocabdictDto):
         service = VocabdictPro()
         Session = openSession()
         session = Session()
-        df = service.hook()
-        print(df.head())
-        session.bulk_insert_mappings(VocabdictDto, df.to_dict(orient="records"))
+        mylist = service.hook()
+        for i,item in enumerate(mylist):
+            df2 = item.to_frame()
+            df2=df2.rename( columns={i: "meaning"})
+            # print(dir(df2.index.names))
+            # print(help(df2.index.names))
+            df2.index.names=['vocab']
+            df2=df2.reset_index()
+            df2.index.names=['id']
+            df2.replace({None: np.nan }, inplace=True)
+            df2=df2.dropna()
+            print(df2)
+            session.bulk_insert_mappings(VocabdictDto, df2.to_dict(orient="records"))
         session.commit()
         session.close()
-    @staticmethod
-    def bulk2():
-        with open('./data/vocabdict.pickle', 'rb') as f:
-            data = pickle.load(f)
-        with open('./data/vocabdict2.pickle', 'rb') as f:
-            data2 = pickle.load(f)
-        with open('./data/vocabdict3.pickle', 'rb') as f:
-            data3 = pickle.load(f)
-        df = pd.DataFrame.from_dict(data,orient='index')
-        mylist=[]
-        df.apply(lambda x: mylist.append(x))
-        df2 = mylist[0].to_frame()
-        df2=df2.rename( columns={0: "meaning"})
-        # print(dir(df2.index.names))
-        # print(help(df2.index.names))
-        df2.index.names=['vocab']
-        df2=df2.reset_index()
-        df2.index.names=['id']
-
-        Session = openSession()
-        session = Session()
-        
-        print(df2.to_dict(orient="records"))
-        session.bulk_insert_mappings(VocabdictDto,df2.to_dict(orient="records"))
-        session.commit()
-        session.close()
+   
 
 
 parser = reqparse.RequestParser()
@@ -112,4 +98,4 @@ class Vocabdict(Resource):
 
 if __name__ == "__main__":
     prepro = VocabdictDao
-    prepro.bulk2()
+    prepro.bulk()
