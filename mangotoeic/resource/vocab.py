@@ -1,3 +1,4 @@
+from mangotoeic.resource.vocablist import VocablistDto
 import pandas as pd
 import json
 from mangotoeic.ext.db import db, openSession
@@ -30,7 +31,7 @@ class VocabDto(db.Model):
     __table_args__={'mysql_collate':'utf8_general_ci'}
 
     vocabId: int = db.Column(db.Integer, primary_key=True, index=True)
-    vocab: str = db.Column(db.String(50))
+    vocab: str = db.Column(db.String(50),db.ForeignKey('vocablist.vocab'))
     user_id: int = db.Column(db.Integer)
     # db.ForeignKey(MinitestDto.qId)
     correctAvg : float = db.Column(db.Float)

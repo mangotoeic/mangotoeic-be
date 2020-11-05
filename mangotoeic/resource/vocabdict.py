@@ -5,7 +5,8 @@ from flask_restful import Resource, reqparse
 import pickle
 import os
 import numpy as np
-# from mangotoeic.resource.vocablist import VocablistDto
+from sqlalchemy import func
+from mangotoeic.resource.vocablist import VocablistDto
 basedir= os.path.dirname(os.path.abspath(__file__))
 
 class VocabdictPro:
@@ -44,7 +45,7 @@ class VocabdictDto(db.Model):
     __tablename__ = 'vocabdict'
     __table_args__={'mysql_collate':'utf8_general_ci'}
     id = db.Column(db.Integer, primary_key=True, index=True)
-    vocab = db.Column(db.String(50))
+    vocab = db.Column(db.String(50), db.ForeignKey('vocablist.vocab'))
     meaning = db.Column(db.String(300))
 
 
@@ -84,6 +85,11 @@ class VocabdictDao(VocabdictDto):
         session.commit()
         session.close()
    
+    @staticmethod
+    def count():
+        Session = openSession()
+        session = Session()
+        return session.query(func.count(VocabdictDto.vocab)).one()
 
 
 parser = reqparse.RequestParser()

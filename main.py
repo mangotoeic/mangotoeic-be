@@ -8,8 +8,8 @@ from flask_cors import CORS
 from mangotoeic.resource.review import ReviewDao
 from mangotoeic.resource.user import User, Users, UserDto, UserDao
 from mangotoeic.resource.testresult import TestResultDao, TestResultDto, TestResult
-from mangotoeic.resource.vocabdict import VocabdictDto
-from mangotoeic.resource.vocablist import VocablistDto
+from mangotoeic.resource.vocabdict import VocabdictDto, VocabdictDao
+from mangotoeic.resource.vocablist import VocablistDto, VocablistDao
 from mangotoeic.resource.recommendation import RecommendationDao
 from mangotoeic.resource.selectedq import SelectedQDto ,SelectedQDao
 import json
@@ -51,6 +51,16 @@ with app.app_context():
     if selectedq_count[0] == 0:
         SelectedQDao.bulk()
 
+    vocablist_count = VocablistDao.count()
+    print(f'***** VocabList Total Count is {vocablist_count} *****')
+    if vocablist_count[0] == 0:
+        VocablistDao.bulk()
+    
+    vocabdict_count = VocabdictDao.count()
+    print(f'***** VocabDict Total Count is {vocabdict_count} *****')
+    if vocabdict_count[0] == 0:
+        VocabdictDao.bulk()
+    
     vocab_count = VocabDao.count()
     print(f'***** Vocab Total Count is {vocab_count} *****')
     if vocab_count[0] == 0:
