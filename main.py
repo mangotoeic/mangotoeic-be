@@ -11,7 +11,7 @@ from mangotoeic.resource.testresult import TestResultDao, TestResultDto, TestRes
 from mangotoeic.resource.vocabdict import VocabdictDto
 from mangotoeic.resource.vocablist import VocablistDto
 from mangotoeic.resource.recommendation import RecommendationDao
-
+from mangotoeic.resource.selectedq import SelectedQDto ,SelectedQDao
 import json
 
 app = Flask(__name__)
@@ -46,6 +46,10 @@ with app.app_context():
     print(f'***** Legacies Total Count is {legacy_count} *****')
     if legacy_count[0] == 0:
         LegacyDao.bulk()
+    selectedq_count = SelectedQDao.count()
+    print(f'***** SelectedQ Total Count is {selectedq_count} *****')
+    if selectedq_count[0] == 0:
+        SelectedQDao.bulk()
 
     vocab_count = VocabDao.count()
     print(f'***** Vocab Total Count is {vocab_count} *****')
