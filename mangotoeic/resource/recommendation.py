@@ -17,7 +17,9 @@ class RecommendationPro:
         return df
     def prepro(self,df):
         print(df)
-        df= df.rename(index={0:'id'},columns={'answered_correctly': "correctAvg"})
+        df= df.rename(columns={'answered_correctly': "correctAvg"})
+        df=df.drop(['Unnamed: 0'],axis=1)
+        df.index.names=['id']
         print(df)
         return df
 
@@ -26,7 +28,7 @@ class  RecommendationDto(db.Model):
     __table_args__={'mysql_collate':'utf8_general_ci'}
     id = db.Column(db.Integer, primary_key =True, index = True)
     qId: int = db.Column(db.Integer, db.ForeignKey('legacies.qId'))
-    user_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer,db.ForeignKey('users.user_id'))
     correctAvg = db.Column(db.Float)
     
     def __repr__(self):

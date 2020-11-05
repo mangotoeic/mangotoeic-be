@@ -24,6 +24,7 @@ class UserDto(db.Model):
     password = db.Column(db.String(20))
     email = db.Column(db.String(20))
     odap = db.relationship("OdapDto", backref='user',lazy=True)
+    recommendation = db.relationship("RecommendationDto", backref='user',lazy=True)
 
     def __repr__(self):
         return f'user_id={self.user_id}, user_name={self.user_name} password={self.password}, email={self.email}'
