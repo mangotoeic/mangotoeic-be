@@ -1,7 +1,7 @@
 import logging
 from flask import Blueprint
 from flask_restful import Api
-from mangotoeic.resource.user import User, Users, Auth, Access
+from mangotoeic.resource.user import User, Users, Auth, Access, Profile
 from mangotoeic.home.api import Home
 from mangotoeic.resource.legacy import Legacy, Legacies
 from mangotoeic.resource.minitest import Minitest
@@ -25,11 +25,15 @@ vocab = Blueprint('vocab', __name__, url_prefix='/api/vocab')
 
 user = Blueprint('user', __name__, url_prefix='/api/user')
 users = Blueprint('users', __name__, url_prefix='/api/users')
+
+profile = Blueprint('profile', __name__, url_prefix='/api/profile/<int:id>')
+
 auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 access = Blueprint('access', __name__, url_prefix='/api/access')
 
 testresult = Blueprint('testresult', __name__, url_prefix='/api/testresult')
 testresults = Blueprint('testresults', __name__, url_prefix='/api/testresults')
+
 review = Blueprint('review', __name__, url_prefix='/api/review')
 reviews = Blueprint('reviews', __name__, url_prefix='/api/reviews')
 
@@ -51,6 +55,7 @@ api = Api(testresults)
 api = Api(preinfo)
 api = Api(review)
 api = Api(reviews)
+api = Api(profile)
 api = Api(selectedqs)
 
 def initialize_routes(api):
@@ -70,6 +75,7 @@ def initialize_routes(api):
     api.add_resource(TestResult, '/api/testresult')
     api.add_resource(TestResults, '/api/testresults')
     api.add_resource(PreInfo, '/api/preinfo')
+    api.add_resource(Profile, '/api/profile/<int:id>')
     api.add_resource(SelectedQs, '/api/selectedqs')
 
 
