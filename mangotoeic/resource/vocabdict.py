@@ -4,6 +4,7 @@ from mangotoeic.ext.db import db, openSession
 from flask_restful import Resource, reqparse
 import pickle
 import os
+# from mangotoeic.resource.vocablist import VocablistDto
 basedir= os.path.dirname(os.path.abspath(__file__))
 
 class VocabdictPro:
@@ -41,14 +42,11 @@ class VocabdictDto(db.Model):
     
     __tablename__ = 'vocabdict'
     __table_args__={'mysql_collate':'utf8_general_ci'}
+    id = db.Column(db.Integer, primary_key=True)
+    vocab = db.Column(db.String(50))
+    meaning = db.Column(db.String(300))
 
-    vocab = db.Column(db.String(50), db.ForeignKey('vocablist.vocab'))
-    meaning = db.Column(db.JSON)
 
-    def __init__(self, vocab, meaning):
-        self.vocab = vocab
-        self.meaning = meaning
-    
     def __repr__(self):
         return f' vocab={self.vocab}, meaning={self.meaning}'
     
@@ -74,6 +72,33 @@ class VocabdictDao(VocabdictDto):
         session.bulk_insert_mappings(VocabdictDto, df.to_dict(orient="records"))
         session.commit()
         session.close()
+    @staticmethod
+    def bulk2():
+        with open('./data/vocabdict.pickle', 'rb') as f:
+            data = pickle.load(f)
+        with open('./data/vocabdict2.pickle', 'rb') as f:
+            data2 = pickle.load(f)
+        with open('./data/vocabdict3.pickle', 'rb') as f:
+            data3 = pickle.load(f)
+        df = pd.DataFrame.from_dict(data,orient='index')
+        mylist=[]
+        df.apply(lambda x: mylist.append(x))
+        df2 = mylist[0].to_frame()
+        df2=df2.rename( columns={0: "meaning"})
+        # print(dir(df2.index.names))
+        # print(help(df2.index.names))
+        df2.index.names=['vocab']
+        df2=df2.reset_index()
+        df2.index.names=['id']
+
+        Session = openSession()
+        session = Session()
+        
+        print(df2.to_dict(orient="records"))
+        session.bulk_insert_mappings(VocabdictDto,df2.to_dict(orient="records"))
+        session.commit()
+        session.close()
+
 
 parser = reqparse.RequestParser()
 parser.add_argument('vocab', type=str, required=True,
@@ -87,4 +112,4 @@ class Vocabdict(Resource):
 
 if __name__ == "__main__":
     prepro = VocabdictDao
-    prepro.bulk()
+    prepro.bulk2()

@@ -50,15 +50,7 @@ class  LegacyDto(db.Model):
     answer = db.Column(db.CHAR(255))
     odap = db.relationship("OdapDto", backref='legacy',lazy=True)
     testresult = db.relationship("TestResultDto", backref='legacy2',lazy=True)
-    def __init__(self, qId, question, ansA , ansB, ansC,ansD ,answer):
-        self.qId = qId
-        self.question = question
-        self.ansA  = ansA 
-        self.ansB = ansB
-        self.ansC  = ansC 
-        self.ansD  = ansD 
-        self.answer  = answer
-        
+    slectedq = db.relationship("SelectedQDto", backref='legacy2',lazy=True)    
         
     def __repr__(self):
         return f'legacies(ansA={self.ansA},ansB={self.ansB},ansC={self.ansC},ansD={self.ansD},answer={self.answer},question={self.question},qId ={self.qId})'
