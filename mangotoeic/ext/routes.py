@@ -31,7 +31,7 @@ profile = Blueprint('profile', __name__, url_prefix='/api/profile/<int:id>')
 auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 access = Blueprint('access', __name__, url_prefix='/api/access')
 
-testresult = Blueprint('testresult', __name__, url_prefix='/api/testresult')
+testresult = Blueprint('testresult', __name__, url_prefix='/api/testresult/<int:id>')
 testresults = Blueprint('testresults', __name__, url_prefix='/api/testresults')
 
 review = Blueprint('review', __name__, url_prefix='/api/review')

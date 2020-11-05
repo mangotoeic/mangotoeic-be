@@ -230,14 +230,12 @@ class Profile(Resource):
     @staticmethod
     def get(id):
         print(id)
-        try:
-            print(type(id))
-            user = UserDto.query.filter(user_id=id).first()
-            print(user)
-            if user:
-                return user, 200
-        except:
-            return {'message': 'User not found'}, 404
+        user = UserDto.query.filter_by(user_id=id).first()
+        print(user)
+        #     if user:
+        #         return user, 200
+        # except:
+        #     return {'message': 'User not found'}, 404
 
 
 
