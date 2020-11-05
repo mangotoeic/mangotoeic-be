@@ -2,11 +2,13 @@ import pandas as pd
 from mangotoeic.ext.db import db , openSession
 import pandas as pd
 from typing import List
-from flask import request
+from flask import request,jsonify
 from flask_restful import Resource, reqparse
 import json
-from sqlalchemy import func
+from sqlalchemy import func 
 import os
+from mangotoeic.resource.legacy import LegacyDto
+
 basedir = os.path.dirname(os.path.abspath(__file__))
 class SelectedQPro:
     def __init__(self):
@@ -35,7 +37,13 @@ class  SelectedQDto(db.Model):
     id =db.Column(db.Integer, primary_key = True, index = True)
     selected_qid = db.Column(db.Integer, db.ForeignKey('legacies.qId'))
     percent_to_selected =db.Column(db.Integer)
-
+    @property
+    def json(self):
+        return {
+            'id' : self.id,
+            'selected_qid' : self.selected_qid,
+            "percent_to_selected":self.percent_to_selected
+        }
 class SelectedQDao(SelectedQDto):
     @staticmethod
     def bulk():
@@ -52,7 +60,30 @@ class SelectedQDao(SelectedQDto):
         Session = openSession()
         session = Session()
         return session.query(func.count(SelectedQDto.selected_qid)).one()
+    @staticmethod
+    def give_random_five_problem():
+        Session =openSession()
+        session =Session()
+        f=session.query(SelectedQDto).order_by(func.random()).limit(5)
+        # print(f.all())
+        mylist =[]
+        
+        for item in f.all():
+            # print(item.json)
+            a =LegacyDto.query.filter_by(qId=item.selected_qid).first()
+            # print(a.json)
 
+            mylist.append(a.json)
+            # print(mylist)
+        return mylist
+
+class SelectedQs(Resource):
+    @staticmethod
+    def get():
+        data = SelectedQDao.give_random_five_problem()
+        
+        print(data)
+        return data, 200
 if __name__ == "__main__":
     pro = SelectedQDao()
-    pro.bulk()
+    pro.give_random_five_problem()

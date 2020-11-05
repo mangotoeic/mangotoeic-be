@@ -12,6 +12,7 @@ from mangotoeic.resource.vocab import Vocab, Vocabs
 from mangotoeic.resource.testresult import TestResult, TestResults
 from mangotoeic.resource.preinfo import PreInfo
 from mangotoeic.resource.review import Review, Reviews
+from mangotoeic.resource.selectedq import SelectedQs
 
 legacies = Blueprint('legacies', __name__, url_prefix='/api/legacies')
 legacy = Blueprint('legacy', __name__, url_prefix='/api/legacy')
@@ -33,6 +34,7 @@ review = Blueprint('review', __name__, url_prefix='/api/review')
 reviews = Blueprint('reviews', __name__, url_prefix='/api/reviews')
 
 preinfo = Blueprint('diagnosis', __name__, url_prefix='/api/preinfo')
+selectedqs = Blueprint('selectedq', __name__, url_prefix='/api/selectedqs')
 
 api = Api(legacy)
 api = Api(legacies)
@@ -49,6 +51,7 @@ api = Api(testresults)
 api = Api(preinfo)
 api = Api(review)
 api = Api(reviews)
+api = Api(selectedqs)
 
 def initialize_routes(api):
     api.add_resource(Home, '/api')
@@ -67,6 +70,8 @@ def initialize_routes(api):
     api.add_resource(TestResult, '/api/testresult')
     api.add_resource(TestResults, '/api/testresults')
     api.add_resource(PreInfo, '/api/preinfo')
+    api.add_resource(SelectedQs, '/api/selectedqs')
+
 
     
 @legacy.errorhandler(500)
