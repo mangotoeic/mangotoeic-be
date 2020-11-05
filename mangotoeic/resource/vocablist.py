@@ -4,7 +4,6 @@ import json
 from typing import List
 from flask import request, jsonify
 from flask_restful import Resource, reqparse
-from mangotoeic.resource.vocablist import VocablistDto
 import os
 basedir= os.path.dirname(os.path.abspath(__file__))
 Session = openSession()
