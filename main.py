@@ -13,6 +13,8 @@ from mangotoeic.resource.vocabdict import VocabdictDao
 from mangotoeic.resource.recommendation import RecommendationDao
 from mangotoeic.resource.selectedq import SelectedQDao
 from mangotoeic.resource.predictMF import PredictMFDao
+from mangotoeic.resource.minitest import Minitests
+
 import json
 
 app = Flask(__name__)
@@ -89,6 +91,5 @@ with app.app_context():
     print(f'*****PredictMF Total Count is {predict_count} *****')
     if predict_count[0] == 0 :
         PredictMFDao.bulk()
-
 initialize_routes(api)
  

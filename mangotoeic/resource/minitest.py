@@ -15,7 +15,7 @@ class MinitestDto(db.Model):
     user_id= db.Column(db.Integer, db.ForeignKey('users.user_id'))
     answer_correctly = db.Column(db.Integer)
     user_avg = db.Column(db.Float)
-
+    user_qid_avg= db.Column(db.Float)
     @property
     def json(self):
         return {
@@ -52,7 +52,13 @@ class MinitestDao(MinitestDto):
         session.execute('update minitest as t inner join (select user_id, avg(answer_correctly) as av from minitest group by user_id ) t1 on t.user_id = t1.user_id set t.user_avg= t1.av;')
         session.commit()
         session.close()
-
+    @staticmethod
+    def get_average2():
+        Session = openSession()
+        session = Session()
+        session.execute('update minitest as t inner join (select user_id,qid, avg(answer_correctly) as av from minitest group by user_id, qId ) t1 on t.user_id = t1.user_id and t.qId= t1.qId  set t.user_qid_avg= t1.av;')
+        session.commit()
+        session.close()
     
 class Minitest(Resource):
     def post(self):
@@ -62,9 +68,12 @@ class Minitests(Resource):
     @staticmethod
     def post():
         body =request.get_json()
+        # body={ "user_id":1 , "qId":[1,2,3,4] ,"answer_correctly":[0,1,1,1] }
         # print(body)
         MinitestDao.bulk(body)
         MinitestDao.get_average()
+        MinitestDao.get_average2()
+        
         # df=RecommendationDao.pivot_table_build()
         users=UserDto.query.all()
         # print(users)
@@ -72,14 +81,20 @@ class Minitests(Resource):
         maxuser=None
         for user in users:
             rcddtos=RecommendationDto.query.filter_by(user_id=user.user_id).all()
+            # print(rcddtos)
             mylist=body['qId']
+            minis=MinitestDto.query.filter_by(user_id=body['user_id']).all()
+            for mini in minis:
+                mylist.append(mini.qId)
+            
+            mylist = set(mylist)
             sum =0
             for rcditm in rcddtos:
                 if rcditm.qId in mylist:
-                    print("=="*100,rcditm)
+                    # print("=="*100,rcditm)
                     minidto =MinitestDto.query.filter_by(user_id=body["user_id"],qId=rcditm.qId).first()
-                    print(minidto)
-                    value=abs(rcditm.correctAvg-minidto.user_avg)
+                    # print(minidto)
+                    value=abs(rcditm.correctAvg-minidto.user_qid_avg)
                     sum+=value
                 elif not rcditm.qId in mylist:
                     sum2=0
@@ -87,8 +102,9 @@ class Minitests(Resource):
                     for rcditm2 in rcddtos:
                         sum2+=rcditm2.correctAvg
                         count+=1
-                    avg_of_user_from_rcd= sum/count
-                    minidto =MinitestDto.query.filter_by(user_id=user.user_id,qId=rcditm.qId).first()
+                    avg_of_user_from_rcd= sum2/count
+                    minidto =MinitestDto.query.filter_by(user_id=body["user_id"]).first()
+                    # print(minidto)
                     value=abs(avg_of_user_from_rcd-minidto.user_avg)
                     sum+=value
             corrent_value=sum
@@ -100,10 +116,10 @@ class Minitests(Resource):
         print(maxvalue)
         q=PredictMFDto.query.filter_by(user_id=maxuser)
         df= pd.read_sql(q.statement,q.session.bind)
-        # print(df)
         df_sorted_by_values=df.sort_values(by='correctAvg',ascending =False)
-        p=df_sorted_by_values[len(df)/2]
-        # print(p)
+        print(df_sorted_by_values)
+        p=df_sorted_by_values.iloc[int(len(df)/2)]
+        print(p)
         median=p['correctAvg']
         mfdtos=q.all()
         mylist2=[]
@@ -121,12 +137,14 @@ class Minitests(Resource):
             mylist2.append(mfdto)
         samplelists= random.sample(mylist2,5)
         mylist3=[]
+        print(samplelists)
         for samplelist in samplelists:
             legacydto=LegacyDto.query.filter_by(qId=samplelist.qId).first()
             mylist3.append(legacydto.json)
-        
+        # print(mylist3)
         return mylist3 , 200
-
+if __name__ == "__main__":
+    Minitests.post()
 
     
         
