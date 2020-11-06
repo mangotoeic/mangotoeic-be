@@ -1,3 +1,4 @@
+import lightgbm
 from flask.globals import session
 import pandas as pd
 from flask import request
@@ -138,7 +139,6 @@ class TestResultDao(TestResultDto):
         prior_question_elapsed_time = data['prior_question_elapsed_time']
         answered_correctly = data['answered_correctly']
         user_answer = data['user_answer']
-        print(user_id)
         for idx ,qid in enumerate(data['qId']):
             some_question=LegacyDto.query.filter_by(qId=qid).first()
             print(some_question)
@@ -179,6 +179,7 @@ class TestResults(Resource):
         # df=pd.DataFrame.from_dict(body)
         TestResultDao.add_testresult(body)
         TestResultDao.get_average()
+        print(Lgbm.predict())
         # data=TestResultDto.query.filter_by(user_id=body['user_id']).first()
         # return data.user_avg, 200
         return {'id': "good"}, 200
@@ -220,12 +221,24 @@ class Lgbm():
         testresult_df = testresult_df[Lgbm().features + [Lgbm().target]]
         return testresult_df
 
+
     @staticmethod
     def fit():
         lgbm = Lgbm()
         testresult_df = lgbm.data_prepro()
+        params = {
+            'bagging_fraction': 0.1817242323514327,
+            'feature_fraction': 0.1884588361650144,
+            'learning_rate': 0.12887924851375825, 
+            'max_depth': -1,
+            'min_child_samples': 20, 
+            'min_data_in_leaf': 1, 
+            'n_estimators': 100,
+            'num_leaves': 2,
+        }
+        model = lightgbm.LGBMClassifier(**params)
         load_model = joblib.load('./mangotoeic/resource/data/lgb_test.pkl')
-        new_model = load_model.fit(testresult_df[Lgbm().features], testresult_df[Lgbm().target], init_model=load_model)
+        new_model = model.fit(testresult_df[Lgbm().features], testresult_df[Lgbm().target], init_model=load_model)
         joblib.dump(new_model, 'lgb_test2.pkl')
         return new_model
 
@@ -241,7 +254,11 @@ class Lgbm():
         test_df['user_id'] = 17 # 리액트에서 받아오는 user_id로 변경해야함
         test_df['answered_correctly'] = new_model.predict_proba(test_df[Lgbm().features])[:,1]
         test_df = test_df[['row_id', 'user_id', 'content_id', 'answered_correctly']]
-        print(test_df)
+        result_group_by = test_df.groupby('user_id')
+        result_groupby_user_answer = result_group_by.agg({'answered_correctly': ['mean']}).copy()
+        result_groupby_user_answer.columns = ['mean_user_accuracy']
+        print(result_groupby_user_answer)
+        return result_groupby_user_answer
 
 
 

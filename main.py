@@ -90,8 +90,6 @@ with app.app_context():
     if predict_count[0] == 0 :
         PredictMFDao.bulk()
 
-    a = Lgbm()
-    a.predict()
 
 initialize_routes(api)
  
