@@ -6,7 +6,7 @@ from mangotoeic.resource.legacy import LegacyDao
 from flask_cors import CORS
 from mangotoeic.resource.review import ReviewDao
 from mangotoeic.resource.user import User, Users, UserDto, UserDao
-from mangotoeic.resource.testresult import TestResultDao, TestResultDto, TestResult
+from mangotoeic.resource.testresult import TestResultDao, TestResultDto, TestResult, TestResults, Lgbm
 from mangotoeic.resource.vocablist import VocablistDto, VocablistDao
 from mangotoeic.resource.vocab import VocabDao 
 from mangotoeic.resource.vocabdict import VocabdictDto, VocabdictDao
@@ -84,6 +84,9 @@ with app.app_context():
     print(f'*****Recommendation Total Count is {recommendation_count} *****')
     if recommendation_count[0] == 0 :
         RecommendationDao.bulk()
+
+    a = Lgbm()
+    a.predict()
 
 initialize_routes(api)
  
