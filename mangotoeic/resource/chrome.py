@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
 import os
+import pickle
 from time import sleep
 import re
 from collections import defaultdict
@@ -67,9 +68,9 @@ def sel_searching_data(driver, item, vocabdict):
     # mylist2 = set(mylist1)
     
     vocabdict[item]=mylist1
-    with open(os.path.join(basedir,"data/finalvocab.pickle"),'wb') as f:
+    with open(os.path.join(basedir,"data/vocabdict4.pickle"),'wb') as f:
         pickle.dump(vocabdict,f)
-    with open(os.path.join(basedir,"data/finalvocab.pickle"),'rb') as f:
+    with open(os.path.join(basedir,"data/vocabdict4.pickle"),'rb') as f:
         data=pickle.load(f)
     print(data)
     return vocabdict
@@ -120,18 +121,26 @@ if __name__ == '__main__':
     import numpy as np
     with open(os.path.join(basedir,'data/vocabdict.pickle'), 'rb') as f:
         data = pickle.load(f)
+    with open(os.path.join(basedir,'data/vocabdict2.pickle'), 'rb') as f:
+        data3 = pickle.load(f)
+    with open(os.path.join(basedir,'data/vocabdict3.pickle'), 'rb') as f:
+        data4 = pickle.load(f)
     with open(os.path.join(basedir,'data/data.pickle'), 'rb') as f:
         data2 = pickle.load(f)
     vocablist = list(data.keys())
     vocabset=set(vocablist)
-    Todoset=data2-vocabset
+    vocablist2 = list(data3.keys())
+    vocabset2 = set(vocablist2)
+    vocablist3 = list(data4.keys())
+    vocabset3 = set(vocablist3)
+    Todoset=data2-vocabset-vocabset2-vocabset3
     vocabdict={}
     mylist =list(Todoset)
     for item in mylist:
         # break
         vocabdict=sel_searching_data(driver, item, vocabdict)    
-    with open(os.path.join(basedir,"data/finalvocab.pickle"),'wb') as f:
+    with open(os.path.join(basedir,"data/vocabdict4.pickle"),'wb') as f:
         pickle.dump(vocabdict,f)
-    with open(os.path.join(basedir,"data/finalvocab.pickle"),'rb') as f:
+    with open(os.path.join(basedir,"data/vocabdict4.pickle"),'rb') as f:
         data=pickle.load(f)
     print(data)

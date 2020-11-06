@@ -1,4 +1,5 @@
 from mangotoeic.resource.vocablist import VocablistDto
+from selenium import webdriver
 import pandas as pd
 import json
 from mangotoeic.ext.db import db, openSession
@@ -6,6 +7,7 @@ from typing import List
 from flask import request, jsonify
 from flask_restful import Resource, reqparse
 from sqlalchemy import func
+from mangotoeic.resource.chrome import sel_searching_data
 import os
 basedir= os.path.dirname(os.path.abspath(__file__))
 
@@ -63,13 +65,32 @@ class VocabDao(VocabDto):
         return json.loads(df.to_json(orient='records'))
     
     @classmethod
-    def find_by_vocab(cls, vocabId):
-        return cls.query.filter_by(vocabId == vocabId).all()
-    
-    @classmethod
     def find_by_id(cls, userid):
-        return cls.query.filter_by(userid == userid).first()
-    
+        driver =webdriver.PhantomJS('/usr/local/bin/phantomjs')
+        p = VocabDto.query.filter_by(user_id = userid).all()
+        vocablist = []
+        # print(p)
+        for item in p:
+            vocab=item.vocab
+            vocabdict={}
+            print(vocab)
+            q = VocablistDto.query.filter_by(vocab=vocab).first()
+            print(q)
+            mylist2=[]
+            if not q:
+                continue
+            for i in q.vocabs2:
+                # vocabdict = sel_searching_data(driver, vocab, vocabdict)
+                # print(vocabdict)
+
+                
+                mylist2.append(i.meaning)
+            vocabdict[vocab]=mylist2
+            vocablist.append(vocabdict)
+        
+        print(vocablist)
+        return vocablist
+
     @classmethod
     def add_vocab(cls, userid, vocabId, newv):
         add_vocab = cls.query.filter(userid == userid, vocabId != vocabId).add(newv)
@@ -109,38 +130,12 @@ parser.add_argument('correctAvg', type=float, required=True,
 
 class Vocab(Resource):
     @staticmethod
-    def post():
-        args = parser.parse_args()
-        print(f'Vocab {args["id"]} added')
-        params = json.loads(request.get_data(), encoding='utf-8')
-        if len(params) == 0:
-            return 'No parameter'
-        params_str = ''
-        for key in params.keys():
-            params_str += 'key: {}, value {}<br>'.format(key, params[key])
-        return {'code':0, 'message': 'SUCCESS'}, 200
-    
-    @staticmethod
     def get(id):
         print(f'Vocab {id} added')
-        try:
-            vocab = VocabDao.find_by_id(id)
-            if vocab:
-                return vocab.json()
-        except Exception as e:
-            return {'message': 'Vocabulary not found'}, 404
-    
-    @staticmethod
-    def update():
-        args = parser.parse_args()
-        print(f'Vocab {args["id"]} updated')
-        return {'code':0, 'message':'SUCCESS'}, 200
-    
-    @staticmethod
-    def delete():
-        args = parser.parse_args()
-        print(f'Vocab {args["id"]} deleted')
-        return {'code':0, 'message':'SUCCESS'}, 200
+        vocab = VocabDao.find_by_id(id)
+        if vocab:
+            return vocab, 200
+        
 
 class Vocabs(Resource):
     def post(self):
@@ -152,5 +147,6 @@ class Vocabs(Resource):
         return data, 200
 
 if __name__ == '__main__':
+    
     prepro = VocabPro()
     prepro.hook()

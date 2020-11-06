@@ -21,7 +21,7 @@ odaps = Blueprint('odaps', __name__, url_prefix='/api/odaps')
 odap = Blueprint('odap', __name__, url_prefix='/api/odap')
 
 vocabs = Blueprint('vocabs', __name__, url_prefix='/api/vocabs')
-vocab = Blueprint('vocab', __name__, url_prefix='/api/vocab')
+vocab = Blueprint('vocab', __name__, url_prefix='/api/vocab/<int:id>')
 
 user = Blueprint('user', __name__, url_prefix='/api/user')
 users = Blueprint('users', __name__, url_prefix='/api/users')
@@ -69,7 +69,7 @@ def initialize_routes(api):
     api.add_resource(Odaps, '/api/odaps')
     api.add_resource(Odap, '/api/odap')
     api.add_resource(Vocabs, '/api/vocabs')
-    api.add_resource(Vocab, '/api/vocab')
+    api.add_resource(Vocab, '/api/vocab/<int:id>')
     api.add_resource(Access, '/api/access')
     api.add_resource(Auth, '/api/auth')
     api.add_resource(TestResult, '/api/testresult')
