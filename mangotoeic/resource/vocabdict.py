@@ -4,6 +4,9 @@ from mangotoeic.ext.db import db, openSession
 from flask_restful import Resource, reqparse
 import pickle
 import os
+import numpy as np
+from sqlalchemy import func
+from mangotoeic.resource.vocablist import VocablistDto
 basedir= os.path.dirname(os.path.abspath(__file__))
 
 class VocabdictPro:
@@ -13,9 +16,8 @@ class VocabdictPro:
         self.fpath3 = os.path.join(basedir, './data/vocabdict3.pickle')
     
     def hook(self):
-        df=self.fileread()
-        print(df.head())
-        return df
+        mylist=self.fileread()
+        return mylist
     
     def fileread(self):
         with open(self.fpath, 'rb') as f:
@@ -24,29 +26,29 @@ class VocabdictPro:
             data2 = pickle.load(f)
         with open(self.fpath3, 'rb') as f:
             data3 = pickle.load(f)
+        vlist = ([str(elem) for elem in data.values()])
+        vlist2 = ([str(elem) for elem in data2.values()])
+        vlist3 = ([str(elem) for elem in data3.values()])
         df = pd.DataFrame.from_dict(data, orient='index')
         df2 = pd.DataFrame.from_dict(data2, orient='index')
         df3 = pd.DataFrame.from_dict(data3, orient='index')
         df = df.append(df2)
         df = df.append(df3)
         # print(df)
-        df.to_csv(os.path.join(basedir, './data/dfcsv.csv'))
-
-        return df
+        mylist=[]
+        df.apply(lambda x: mylist.append(x))
+        
+        return mylist
 
 class VocabdictDto(db.Model):
     
     __tablename__ = 'vocabdict'
     __table_args__={'mysql_collate':'utf8_general_ci'}
+    id = db.Column(db.Integer, primary_key=True, index=True)
+    vocab = db.Column(db.String(50), db.ForeignKey('vocablist.vocab'))
+    meaning = db.Column(db.String(300))
 
-    vocab = db.Column(db.String(50), primary_key=True)
-    meaning = db.Column(db.JSON)
-    vocabs = db.relationship("VocabDto", backref='vocabdict',lazy=True)
 
-    def __init__(self, vocab, meaning):
-        self.vocab = vocab
-        self.meaning = meaning
-    
     def __repr__(self):
         return f' vocab={self.vocab}, meaning={self.meaning}'
     
@@ -67,11 +69,28 @@ class VocabdictDao(VocabdictDto):
         service = VocabdictPro()
         Session = openSession()
         session = Session()
-        df = service.hook()
-        print(df.head())
-        session.bulk_insert_mappings(VocabdictDto, df.to_dict(orient="records"))
+        mylist = service.hook()
+        for i,item in enumerate(mylist):
+            df2 = item.to_frame()
+            df2=df2.rename( columns={i: "meaning"})
+            # print(dir(df2.index.names))
+            # print(help(df2.index.names))
+            df2.index.names=['vocab']
+            df2=df2.reset_index()
+            df2.index.names=['id']
+            df2.replace({None: np.nan }, inplace=True)
+            df2=df2.dropna()
+            print(df2)
+            session.bulk_insert_mappings(VocabdictDto, df2.to_dict(orient="records"))
         session.commit()
         session.close()
+   
+    @staticmethod
+    def count():
+        Session = openSession()
+        session = Session()
+        return session.query(func.count(VocabdictDto.vocab)).one()
+
 
 parser = reqparse.RequestParser()
 parser.add_argument('vocab', type=str, required=True,

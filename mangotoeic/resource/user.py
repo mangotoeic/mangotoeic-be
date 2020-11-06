@@ -24,13 +24,9 @@ class UserDto(db.Model):
     password = db.Column(db.String(20))
     email = db.Column(db.String(20))
     odap = db.relationship("OdapDto", backref='user',lazy=True)
-
-    def __init__(self, user_id=0, user_name='', password='', email=''):
-        self.user_id = user_id
-        self.user_name = user_name
-        self.password = password
-        self.email = email
-
+    recommendation = db.relationship("RecommendationDto", backref='user',lazy=True)
+    minitest = db.relationship("MinitestDto", backref='user',lazy=True)
+    
     def __repr__(self):
         return f'user_id={self.user_id}, user_name={self.user_name} password={self.password}, email={self.email}'
 
@@ -84,7 +80,10 @@ class UserDao(UserDto):
 
     @classmethod
     def find_by_id(cls, userid):
-        return cls.query.filter_by(userid == userid).first()
+        print(userid)
+        p=UserDto.query.filter_by(user_id=userid).first()
+        print(p)
+        return p
 
     @classmethod
     def login(cls, user):
@@ -161,10 +160,10 @@ class User(Resource):
         #     return {'message': 'An error occured inserting the user'}, 500
 
     # @staticmethod
-    # def get(email):
-    #     print(f'User {email} added ')
+    # def get():
     #     try:
     #         user = UserDao.find_by_id(id)
+    #         print(user)
     #         if user:
     #             return user.json()
     #     except:
@@ -226,6 +225,18 @@ class Access(Resource):
         user.email = args.email
         data = UserDao.login(user)
         return data[0], 200
+
+class Profile(Resource):
+    @staticmethod
+    def get(id):
+        print(id)
+        user = UserDto.query.filter_by(user_id=id).first()
+        print(user)
+        #     if user:
+        #         return user, 200
+        # except:
+        #     return {'message': 'User not found'}, 404
+
 
 
 # if __name__ == "__main__":

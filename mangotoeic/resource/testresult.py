@@ -7,9 +7,9 @@ from sqlalchemy import engine
 from sqlalchemy.orm import sessionmaker
 from mangotoeic.ext.db import db, openSession, engine
 from mangotoeic.ext.db import Base
-import json
 from mangotoeic.resource.user import UserDto
 from mangotoeic.resource.legacy import LegacyDto
+import json
 
 # 토익 시험 몇번 봤는지, 목표점수, 시험날짜, 본인의 영어실력 입력
 # 데이터 베이스에 반영할 건지?
@@ -20,12 +20,13 @@ class TestResultDto(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, index=True)
     #userid: int = db.Column(db.Integer, db.ForeignKey(UserDto.user_id))
-    user_id = db.Column(db.Integer, db.ForeignKey(UserDto.user_id))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     timestamp = db.Column(db.Float)
-    qId: int = db.Column(db.Integer, db.ForeignKey('legacies.qId'))
+    qId = db.Column(db.Integer, db.ForeignKey('legacies.qId'))
     user_answer = db.Column(db.Integer)
     answered_correctly = db.Column(db.Float)
     prior_question_elapsed_time = db.Column(db.Float)
+    user_avg = db.Column(db.Float)
 
     # def __init__(self, id=0, user_id=0, qId=0, user_answer=0, answered_correctly=0.0, prior_question_elapsed_time=0.0, timestamp=0):
     #     self.id = id
@@ -51,7 +52,8 @@ class TestResultDto(db.Model):
             'qId' : self.qId,
             'user_answer' : self.user_answer,
             'answered_correctly': self.answered_correctly,
-            'prior_question_elapsed_time': self.prior_question_elapsed_time
+            'prior_question_elapsed_time': self.prior_question_elapsed_time,
+            'user_avg' : self.user_avg
         }
         
         
@@ -71,20 +73,6 @@ class TestResultDto(db.Model):
     #     data = cls.query.get(user_id)
     #     session.delete(data)
     #     session.commit()
-
-
-# class UserVo:
-#     id : int = 0
-#     timestamp: int = 0
-#     password: str = ''
-#     email: str = ''
-#     user_name : str = ''
-#     user_id : int = 0
-#     qId : int = 0
-#     user_answer : int = 0
-#     answered_correctly : float = 0.0
-#     prior_question_elapsed_time : float = 0.0
-#     email : str = ''
     
 
 class TestResultDao(TestResultDto):
@@ -118,6 +106,14 @@ class TestResultDao(TestResultDto):
         Session = openSession()
         session = Session()
         return session.query(func.count(TestResultDto.user_id)).one()
+
+    @staticmethod
+    def get_average():
+        Session = openSession()
+        session = Session()
+        session.execute('update testresult as t inner join (select user_id, avg(answered_correctly) as av from testresult group by user_id ) t1 on t.user_id = t1.user_id set t.user_avg= t1.av;')
+        session.commit()
+        session.close()
             
 
     @staticmethod
@@ -150,6 +146,7 @@ class TestResultDao(TestResultDto):
                         legacy2=some_question)
             db.session.add(x)    
         db.session.commit()
+        db.session.close()
 
     # @staticmethod
     # def modify_user(user):
@@ -167,54 +164,9 @@ class TestResultDao(TestResultDto):
     #     session.commit()
 
 
-# parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
-# parser.add_argument('name', type=str, required=False, help='This field should be a email')
-# parser.add_argument('email', type=str, required=True,
-#                                         help='This field should be a email')
-# parser.add_argument('password', type=str, required=True,
-#                                         help='This field should be a password')
-
-
 class TestResult(Resource):
+    pass
 
-    @staticmethod
-    def post():
-        body = request.get_json()
-        print("+++=++"*30,body)
-        testresult = TestResultDto(**body)
-        # user.user_name = body['user_name']
-        # user.email =body['email']
-        # user.password = body['password']
-        TestResultDao.save(testresult)
-        # user_name = user.user_name
-        # email = user.email
-        # password = user.password
-        # return {'hi'}, 200
-
-        # try: 
-        #     UserDao.save(args)
-        #     return {'code' : 0, 'message' : 'SUCCESS'}, 200    
-        # except:
-        #     return {'message': 'An error occured inserting the user'}, 500
-
-    # @staticmethod
-    # def get(email):
-    #     print(f'User {email} added ')
-    #     try:
-    #         user = UserDao.find_by_id(id)
-    #         if user:
-    #             return user.json()
-    #     except:
-    #         return {'message': 'User not found'}, 404
-
-    # def put(self, id):
-    #     data = User.parser.parse_args()
-    #     user = User.find_by_id(id)
-
-    #     user.user_id = data['user_id']
-    #     user.email = data['email']
-    #     user.save()
-    #     return user.json()
 
 class TestResults(Resource):
     @staticmethod
@@ -223,8 +175,9 @@ class TestResults(Resource):
         print(body)
         # df=pd.DataFrame.from_dict(body)
         TestResultDao.add_testresult(body)
-
-        return {'id': "good"}, 200
+        TestResultDao.get_average()
+        data=TestResultDto.query.filter_by(user_id=body['user_id']).first()
+        return data.user_avg, 200
 
 
     # def post():
@@ -272,13 +225,3 @@ class TestResults(Resource):
 #         user.email = args.email
 #         data = UserDao.login(user)
 #         return data[0], 200
-
-
-# if __name__ == "__main__":
-#     userdao = UserDao()
-#     userdao.userdata_to_sql()
-    # userdao.add_user('444', 9834, 3, 1, 39000)
-    # userdao.delete_user('115')        
-    # userdao.update_user(1, 'user_name', '박지성')
-    # userdao.update_user(user_id_loop, names_loop)
-    # a = userdao.fetch_user('666')

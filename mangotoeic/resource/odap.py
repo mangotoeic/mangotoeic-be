@@ -8,10 +8,10 @@ from typing import List
 from flask import request, jsonify
 from flask_restful import Resource, reqparse
 import os
-
 basedir= os.path.dirname(os.path.abspath(__file__))
 Session = openSession()
 session = Session()
+
 class OdapPro:
     def __init__(self):
         self.fpath =''
@@ -119,18 +119,12 @@ class Odap(Resource):
         print(args)
         d=UserDto.query.filter_by(user_id=args['user_id']).first()
         print(d.odap)
-        bdict = {}
+        blist = []
         for idx, item in enumerate(d.odap):
             p = LegacyDto.query.filter_by(qId=item.qId).first()
-            mydict = {'question': p.question, 
-            'ansA': p.ansA,
-            'ansB': p.ansB,
-            'ansC': p.ansC,
-            'ansD': p.ansD,
-            'answer': p.answer}
-            bdict[idx] = mydict
+            blist.append(p.json)
 
-        return bdict , 200
+        return blist , 200
     
     @staticmethod
     def update():
