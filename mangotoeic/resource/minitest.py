@@ -4,7 +4,8 @@ from flask_restful import Resource, reqparse
 import pandas as pd
 from flask import request
 from mangotoeic.resource.recommendation import RecommendationDao, RecommendationDto
-
+from mangotoeic.resource.predictMF import PredictMFDto 
+import random
 class MinitestDto(db.Model):
     __tablename__ = "minitest"
     __table_args__ = {'mysql_collate':'utf8_general_ci'}
@@ -49,9 +50,12 @@ class MinitestDao(MinitestDto):
         session.execute('update minitest as t inner join (select user_id, avg(answered_correctly) as av from minitest group by user_id ) t1 on t.user_id = t1.user_id set t.user_avg= t1.av;')
         session.commit()
         session.close()
+
+    
 class Minitest(Resource):
     def post(self):
         pass
+
 class Minitests(Resource):
     @staticmethod
     def post():
@@ -89,8 +93,42 @@ class Minitests(Resource):
             
         print(maxuser)
         print(maxvalue)
+        q=PredictMFDto.query.filter_by(user_id=maxuser)
+        df= pd.read_sql(q.statement,q.session.bind)
+        print(df)
+        df_sorted_by_values=df.sort_values(by='correctAvg',ascending =False)
+        p=df_sorted_by_values[len(df)/2]
+        print(p)
+        median=p['correctAvg']
+        mfdtos=q.all()
+        mylist2=[]
+        for mfdto in mfdtos:
+            # mfdto중 가장 중간 오답률을 찾는다
+            difference=median-mfdto.correctAvg
+            if abs(difference)>0.5:
+                continue
+            if difference < 0: #맞출확률이 높다면
+                x=random.randint(0,1)
+                if x==0: 
+                    continue
+                if x==1:
+                    pass
+            mylist2.append(mfdto)
+        samplelists= random.sample(mylist2,5)
+        mylist3=[]
+        for samplelist in samplelists:
+            mylist3.append(samplelist.json)
+        return mylist3 , 200
         
+
+    
         
+
+            
+        
+               
+         
+
 
 
                 
