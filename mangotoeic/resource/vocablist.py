@@ -13,9 +13,7 @@ session = Session()
 
 class VocablistPro:
     def __init__(self):
-        self.fpath = os.path.join(basedir, './data/vocabdict.pickle')
-        self.fpath2 = os.path.join(basedir, './data/vocabdict2.pickle')
-        self.fpath3 = os.path.join(basedir, './data/vocabdict3.pickle')
+        self.fpath = os.path.join(basedir, './data/data.pickle')
     
     def hook(self):
         df=self.fileread()
@@ -24,13 +22,7 @@ class VocablistPro:
     def fileread(self):
         with open(self.fpath, 'rb') as f:
             data = pickle.load(f)
-        with open(self.fpath2, 'rb') as f:
-            data2 = pickle.load(f)
-        with open(self.fpath3, 'rb') as f:
-            data3 = pickle.load(f)
-        data.update(data2)
-        data.update(data3)
-        mylist = (list(data.keys()))
+        mylist=list(data)
         df=pd.DataFrame(mylist , columns=['vocab'])
         
         return df
