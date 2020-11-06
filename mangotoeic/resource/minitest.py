@@ -21,7 +21,8 @@ class MinitestDto(db.Model):
         return {
             'user_id' :self.user_id,
             'qId' : self.qId,
-            'answer_correctly' :self.answer_correctly
+            'answer_correctly' :self.answer_correctly,
+            "user_avg":self.user_avg
         }
 class MinitestDao(MinitestDto):
     
@@ -48,7 +49,7 @@ class MinitestDao(MinitestDto):
     def get_average():
         Session = openSession()
         session = Session()
-        session.execute('update minitest as t inner join (select user_id, avg(answered_correctly) as av from minitest group by user_id ) t1 on t.user_id = t1.user_id set t.user_avg= t1.av;')
+        session.execute('update minitest as t inner join (select user_id, avg(answer_correctly) as av from minitest group by user_id ) t1 on t.user_id = t1.user_id set t.user_avg= t1.av;')
         session.commit()
         session.close()
 
@@ -61,12 +62,12 @@ class Minitests(Resource):
     @staticmethod
     def post():
         body =request.get_json()
-        print(body)
+        # print(body)
         MinitestDao.bulk(body)
         MinitestDao.get_average()
-        df=RecommendationDao.pivot_table_build()
+        # df=RecommendationDao.pivot_table_build()
         users=UserDto.query.all()
-        print(users)
+        # print(users)
         maxvalue=0
         maxuser=None
         for user in users:
@@ -75,7 +76,9 @@ class Minitests(Resource):
             sum =0
             for rcditm in rcddtos:
                 if rcditm.qId in mylist:
-                    minidto =Minitest.query.filter_by(user_id=user.user_id,qId=rcditm.qId).first()
+                    print("=="*100,rcditm)
+                    minidto =MinitestDto.query.filter_by(user_id=body["user_id"],qId=rcditm.qId).first()
+                    print(minidto)
                     value=abs(rcditm.correctAvg-minidto.user_avg)
                     sum+=value
                 elif not rcditm.qId in mylist:
@@ -85,7 +88,7 @@ class Minitests(Resource):
                         sum2+=rcditm2.correctAvg
                         count+=1
                     avg_of_user_from_rcd= sum/count
-                    minidto =Minitest.query.filter_by(user_id=user.user_id,qId=rcditm.qId).first()
+                    minidto =MinitestDto.query.filter_by(user_id=user.user_id,qId=rcditm.qId).first()
                     value=abs(avg_of_user_from_rcd-minidto.user_avg)
                     sum+=value
             corrent_value=sum
@@ -97,10 +100,10 @@ class Minitests(Resource):
         print(maxvalue)
         q=PredictMFDto.query.filter_by(user_id=maxuser)
         df= pd.read_sql(q.statement,q.session.bind)
-        print(df)
+        # print(df)
         df_sorted_by_values=df.sort_values(by='correctAvg',ascending =False)
         p=df_sorted_by_values[len(df)/2]
-        print(p)
+        # print(p)
         median=p['correctAvg']
         mfdtos=q.all()
         mylist2=[]
