@@ -25,7 +25,8 @@ class UserDto(db.Model):
     email = db.Column(db.String(20))
     odap = db.relationship("OdapDto", backref='user',lazy=True)
     recommendation = db.relationship("RecommendationDto", backref='user',lazy=True)
-
+    minitest = db.relationship("MinitestDto", backref='user',lazy=True)
+    
     def __repr__(self):
         return f'user_id={self.user_id}, user_name={self.user_name} password={self.password}, email={self.email}'
 
@@ -229,14 +230,12 @@ class Profile(Resource):
     @staticmethod
     def get(id):
         print(id)
-        try:
-            print(type(id))
-            user = UserDto.query.filter(user_id=id).first()
-            print(user)
-            if user:
-                return user, 200
-        except:
-            return {'message': 'User not found'}, 404
+        user = UserDto.query.filter_by(user_id=id).first()
+        print(user)
+        #     if user:
+        #         return user, 200
+        # except:
+        #     return {'message': 'User not found'}, 404
 
 
 
