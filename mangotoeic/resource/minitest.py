@@ -99,9 +99,6 @@ class Minitests(Resource):
 
 
 
-            comparedict[user.id]=rcdlist
-        print(comparedict)
-
 
 
 
