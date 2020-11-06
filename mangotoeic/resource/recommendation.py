@@ -84,7 +84,7 @@ class RecommendationDao(RecommendationDto):
         df= pd.read_sql(q.statement,q.session.bind)
         df_pivot= df.pivot(index="user_id", columns='qId', values='correctAvg')
         print(df_pivot)
-        print(df)
+        return df_pivot
 class Recommendation(Resource):
     def __init__(self):
         parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
