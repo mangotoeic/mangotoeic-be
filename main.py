@@ -3,13 +3,13 @@ from flask_restful import Api
 from mangotoeic.ext.db import url, db
 from mangotoeic.ext.routes import initialize_routes
 from mangotoeic.resource.legacy import LegacyDao 
-from mangotoeic.resource.vocab import VocabDao 
 from flask_cors import CORS
 from mangotoeic.resource.review import ReviewDao
 from mangotoeic.resource.user import User, Users, UserDto, UserDao
 from mangotoeic.resource.testresult import TestResultDao, TestResultDto, TestResult
-from mangotoeic.resource.vocabdict import VocabdictDto, VocabdictDao
 from mangotoeic.resource.vocablist import VocablistDto, VocablistDao
+from mangotoeic.resource.vocab import VocabDao 
+from mangotoeic.resource.vocabdict import VocabdictDto, VocabdictDao
 from mangotoeic.resource.recommendation import RecommendationDao
 from mangotoeic.resource.selectedq import SelectedQDto ,SelectedQDao
 import json
