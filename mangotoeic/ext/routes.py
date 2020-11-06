@@ -5,7 +5,7 @@ from mangotoeic.resource.user import User, Users, Auth, Access, Profile
 from mangotoeic.resource.preinfo import PreInfo
 from mangotoeic.home.api import Home
 from mangotoeic.resource.legacy import Legacy, Legacies
-from mangotoeic.resource.minitest import Minitest
+
 from mangotoeic.resource.newq import NewQ , NewQs
 from mangotoeic.resource.recommendation import Recommendation
 from mangotoeic.resource.odap import Odap, Odaps
@@ -13,6 +13,7 @@ from mangotoeic.resource.vocab import Vocab, Vocabs
 from mangotoeic.resource.testresult import TestResult, TestResults
 from mangotoeic.resource.review import Review, Review2, Reviews
 from mangotoeic.resource.selectedq import SelectedQs
+from mangotoeic.resource.minitest import Minitest,Minitests
 legacies = Blueprint('legacies', __name__, url_prefix='/api/legacies')
 legacy = Blueprint('legacy', __name__, url_prefix='/api/legacy')
 
@@ -39,6 +40,7 @@ reviews = Blueprint('reviews', __name__, url_prefix='/api/reviews')
 
 preinfo = Blueprint('diagnosis', __name__, url_prefix='/api/preinfo')
 selectedqs = Blueprint('selectedq', __name__, url_prefix='/api/selectedqs')
+minitests = Blueprint('selectedq', __name__, url_prefix='/api/minitests')
 
 api = Api(legacy)
 api = Api(legacies)
@@ -57,6 +59,7 @@ api = Api(review)
 api = Api(review2)
 api = Api(reviews) 
 api = Api(selectedqs)
+api = Api(minitests)
 def initialize_routes(api):
     api.add_resource(Home, '/api')
     api.add_resource(User, '/api/user')
@@ -77,6 +80,7 @@ def initialize_routes(api):
     api.add_resource(PreInfo, '/api/preinfo')
     api.add_resource(Profile, '/api/profile/<int:id>')
     api.add_resource(SelectedQs, '/api/selectedqs')
+    api.add_resource(Minitests, '/api/minitests')
 
 
     

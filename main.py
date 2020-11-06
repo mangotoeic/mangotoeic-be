@@ -9,9 +9,10 @@ from mangotoeic.resource.user import User, Users, UserDto, UserDao
 from mangotoeic.resource.testresult import TestResultDao, TestResultDto, TestResult, TestResults, Lgbm
 from mangotoeic.resource.vocablist import VocablistDto, VocablistDao
 from mangotoeic.resource.vocab import VocabDao 
-from mangotoeic.resource.vocabdict import VocabdictDto, VocabdictDao
+from mangotoeic.resource.vocabdict import VocabdictDao
 from mangotoeic.resource.recommendation import RecommendationDao
-from mangotoeic.resource.selectedq import SelectedQDto ,SelectedQDao
+from mangotoeic.resource.selectedq import SelectedQDao
+from mangotoeic.resource.predictMF import PredictMFDao
 import json
 
 app = Flask(__name__)
@@ -84,6 +85,10 @@ with app.app_context():
     print(f'*****Recommendation Total Count is {recommendation_count} *****')
     if recommendation_count[0] == 0 :
         RecommendationDao.bulk()
+    predict_count = PredictMFDao.count()
+    print(f'*****PredictMF Total Count is {predict_count} *****')
+    if predict_count[0] == 0 :
+        PredictMFDao.bulk()
 
     a = Lgbm()
     a.predict()
