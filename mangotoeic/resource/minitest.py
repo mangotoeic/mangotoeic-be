@@ -6,6 +6,7 @@ from flask import request
 from mangotoeic.resource.recommendation import RecommendationDao, RecommendationDto
 from mangotoeic.resource.predictMF import PredictMFDto 
 from mangotoeic.resource.legacy import LegacyDto
+from mangotoeic.resource.nextminiset import NextMiniSetDao
 import random
 class MinitestDto(db.Model):
     __tablename__ = "minitest"
@@ -26,17 +27,6 @@ class MinitestDto(db.Model):
         }
 class MinitestDao(MinitestDto):
     
-    @classmethod
-    def find_all(cls):
-        return cls.query.all()
-
-    @classmethod 
-    def find_by_qId(cls,qId):
-        return cls.query.filter_by(qId==qId).all()
-
-    @classmethod
-    def find_by_id(cls,id):
-        return cls.query.filter_by(id==id).first()
     @staticmethod
     def bulk(body):
         Session = openSession()
@@ -141,8 +131,15 @@ class Minitests(Resource):
         for samplelist in samplelists:
             legacydto=LegacyDto.query.filter_by(qId=samplelist.qId).first()
             mylist3.append(legacydto.json)
-        # print(mylist3)
+        print(mylist3)
+        NextMiniSetDao.delete(body['user_id'])
+        for item in mylist3:
+            qId= item['qId']
+            
+            NextMiniSetDao.add(body['user_id'],qId)
         return mylist3 , 200
+
+
 if __name__ == "__main__":
     Minitests.post()
 
