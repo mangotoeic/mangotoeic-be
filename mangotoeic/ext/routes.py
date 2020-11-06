@@ -10,7 +10,7 @@ from mangotoeic.resource.recommendation import Recommendation
 from mangotoeic.resource.odap import Odap, Odaps
 from mangotoeic.resource.vocab import Vocab, Vocabs
 from mangotoeic.resource.testresult import TestResult, TestResults
-from mangotoeic.resource.review import Review, Reviews, ReviewSearchByEmail
+from mangotoeic.resource.review import Review, Review2, Reviews
 
 legacies = Blueprint('legacies', __name__, url_prefix='/api/legacies')
 legacy = Blueprint('legacy', __name__, url_prefix='/api/legacy')
@@ -29,9 +29,9 @@ access = Blueprint('access', __name__, url_prefix='/api/access')
 testresult = Blueprint('testresult', __name__, url_prefix='/api/testresult')
 testresults = Blueprint('testresults', __name__, url_prefix='/api/testresults')
 
-review = Blueprint('review', __name__, url_prefix='/api/review/<string:id>')
-reviews = Blueprint('reviews', __name__, url_prefix='/api/reviews')
-reviewsearchbyemail = Blueprint('reviews', __name__, url_prefix='/api/reviewsearchbyemail/<string:id>')
+review = Blueprint('review', __name__, url_prefix='/api/review/<string:review>') 
+review2 = Blueprint('review2', __name__, url_prefix='/api/review2/')
+reviews = Blueprint('reviews', __name__, url_prefix='/api/reviews') 
 
 
 api = Api(legacy)
@@ -47,15 +47,15 @@ api = Api(auth)
 api = Api(testresult)
 api = Api(testresults)
 api = Api(review)
-api = Api(reviews)
-api = Api(reviewsearchbyemail)
+api = Api(review2)
+api = Api(reviews) 
 
 def initialize_routes(api):
     api.add_resource(Home, '/api')
     api.add_resource(User, '/api/user')
     api.add_resource(Users, '/api/users')
-    api.add_resource(Review, '/api/review/<string:id>')
-    api.add_resource(ReviewSearchByEmail, '/api/reviewsearchbyemail/<string:id>')
+    api.add_resource(Review, '/api/review/<string:review>') 
+    api.add_resource(Review2, '/api/review2') 
     api.add_resource(Reviews, '/api/reviews/')
     api.add_resource(Legacy, '/api/legacy')
     api.add_resource(Legacies, '/api/legacies')

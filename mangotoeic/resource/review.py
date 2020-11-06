@@ -196,7 +196,6 @@ import time
 
 class WebCrawler():
     def __init__(self):
-        self.driver = webdriver.Chrome('C:/Users/jongm/Desktop/chromedriver.exe')
         self.reviews = []
     
     def hook_process(self):
@@ -227,24 +226,25 @@ class WebCrawler():
         return text
 
     def webdata_toCsv(self,urls):
+        driver = webdriver.Chrome('mangotoeic/resource/data/chromedriver86.0424.exe')
         for i in range(len(urls)):
             url = urls[i]
-            self.driver.get(url)
-            self.driver.maximize_window()
+            driver.get(url)
+            driver.maximize_window()
             time.sleep(2)
             n=0
             nomorebutton=0
             while n<30 and nomorebutton < 5: # 3200개 뽑아줌
                 for i in range(4):
-                    self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                     time.sleep(1)
                     try:
-                        self.driver.find_element_by_xpath("//span[@class='RveJvd snByac']").click()
+                        driver.find_element_by_xpath("//span[@class='RveJvd snByac']").click()
                         n += 1
                         nomorebutton = 0
                     except Exception:
                         nomorebutton += 1   
-            mysoup = BeautifulSoup(self.driver.page_source, 'html.parser')
+            mysoup = BeautifulSoup(driver.page_source, 'html.parser')
 
             allreviews = mysoup.find_all('div', {'class':'d15Mdf bAhLNe'})
             
@@ -255,7 +255,7 @@ class WebCrawler():
                 text = wc.cleanse(comment)
                 if len(text) > 3:
                     self.reviews.append((text,star))
-        self.driver.quit()    
+        driver.quit()    
         df = pd.DataFrame(self.reviews, columns = ['review','star'])
         return df
 
@@ -297,11 +297,7 @@ urls = ['https://play.google.com/store/apps/details?id=com.taling&showAllReviews
 'https://play.google.com/store/apps/details?id=com.hackers.app.toeicvoca'
 ]
 
-
-# if __name__ == "__main__":
-#     wc = WebCrawler()
-#     wc.hook_process()
-
+ 
 #########################
 ########################
 ############DTO, SERVICE###########
@@ -373,63 +369,51 @@ class ReviewService(object):
 # ==============================================================
 
 
+
 Session = openSession()
 session = Session()
 
 class ReviewDao(ReviewDto):
     
     @staticmethod
-    def find_all():
+    def find_all(): 
         return session.query(ReviewDto).all()
 
     @classmethod 
-    def find_by_email(cls,email):
+    def find_by_email(cls,email): 
+        print('FIND BY EMAIL ACTIVATED')
         return session.query(ReviewDto).filter(ReviewDto.email.like(f'%{email}%')).all() 
-      
+
 
     @classmethod
-    def find_by_id(cls,id):
-        return session.query(ReviewDto).filter(ReviewDto.email.like(f'%{id}%')).one()
-
-    @classmethod
-    def find_by_star(cls,star):
-        return session.query(ReviewDto).filter(ReviewDto.email.like(f'%{star}%')).all()
-
-    @classmethod
-    def find_by_review(cls,review):
-        return session.query(ReviewDto).filter(ReviewDto.email.like(f'%{review}%')).all()
+    def find_by_review(cls,review): 
+        print('FIND BY REVIEW ACTIVATED')
+        return session.query(ReviewDto).filter(ReviewDto.review.like(f'%{review}%')).all()
 
     @staticmethod
-    def save(review):
+    def save(review): 
         session.add(review)
         session.commit()
         
     @staticmethod
-    def update(review):
-        Session = openSession()
-        session = Session()
+    def update(review): 
         session.add(review)
         session.commit()
 
-    @classmethod
-    def delete(cls,id):
-        Session = openSession()
-        session = Session()
-        data = cls.query.get(id)
-        session.delete(data)
+    @staticmethod
+    def delete(id): 
+        print('123')
+        session.query(ReviewDto).filter(ReviewDto.id == id).delete()
         session.commit()
     
+    
     @staticmethod
-    def count():
-        Session = openSession()
-        session = Session()
+    def count(): 
         return session.query(func.count(ReviewDto.id)).one()
 
     @staticmethod
     def insert_many():
         service = Prepro()
-        Session = openSession()
-        session = Session()
         df = service.get_data()
         print(df.head())
         session.bulk_insert_mappings(ReviewDto, df.to_dict(orient = 'records'))
@@ -447,15 +431,15 @@ class ReviewDao(ReviewDto):
 # ==============================================================
 
 
-parser = reqparse.RequestParser()
-
-parser.add_argument('email', type = str, required = True, help = 'This field should be email, cannot be left blank')
-parser.add_argument('review', type = str, required = True, help = 'This field should be review, cannot be left blank') 
 
 class Review(Resource):
 
     @staticmethod
     def post():
+        parser = reqparse.RequestParser()
+        parser.add_argument('email', type = str, required = True, help = 'This field should be email, cannot be left blank')
+        parser.add_argument('review', type = str, required = True, help = 'This field should be review, cannot be left blank') 
+
         args = parser.parse_args()
         probstar = ReviewService.predict(args)
         print(f'예측 별점은 {probstar[0]}% 의 확률로 {probstar[1]}입니다')
@@ -468,44 +452,66 @@ class Review(Resource):
             return {'message' : ' an error occured while inserting review'}, 500 
 
     @staticmethod
-    def get(review_content):
+    def get(review):
         try:
-            review = ReviewDao.find_by_review(review_content)
-            if review:
-                return review.json(), 200
+            review_searched = ReviewDao.find_by_review(review) 
+            if review_searched: 
+                lst= []
+                for single_review_searched in review_searched:
+                    srs = {
+                            'id' : single_review_searched.id,
+                            'email' : single_review_searched.email,
+                            'review' : single_review_searched.review,
+                            'star' : single_review_searched.star,
+                            }
+                    print(srs)
+                    lst.append(srs) 
+                return (lst), 200
         except Exception as e:
-            return {'message': 'review not found'}, 404 
+            return {'message': 'review_searched not found'}, 404 
 
-    @staticmethod
-    def update():
-        args = parser.parse_args()
-        print(f'Review {args.email} updated')
-        return {'code' :0, 'message' : 'Success'}, 200
+    
 
+     
+ 
+
+
+class Review2(Resource):
+    
     @staticmethod
-    def delete(id: int):
+    def post():
+        parser = reqparse.RequestParser()
+        parser.add_argument('email', type = str, required = True, help = 'This field should be email, cannot be left blank')
+        parser.add_argument('review', type = str, required = True, help = 'This field should be review, cannot be left blank') 
+
         args = parser.parse_args()
-        print(f'Review posted by {args.email} deleted')
+        probstar = ReviewService.predict(args)
+        print(f'예측 별점은 {probstar[0]}% 의 확률로 {probstar[1]}입니다')
+        new_review = ReviewDto(email=args.email, review=args.review, star=probstar[1])
+        print(new_review)
+        try:
+            ReviewDao.save(new_review) 
+            return {'star': probstar[1], 'prob':probstar[0]}, 200
+        except:
+            return {'message' : ' an error occured while inserting review'}, 500 
+ 
+    @staticmethod
+    def delete(): 
+        parser = reqparse.RequestParser()
+        parser.add_argument('id', type = int, required = True, help = 'This field should be email, cannot be left blank')
+        args = parser.parse_args()
+        print('aaaaaaaaaaaaaaaaaaaa')
         ReviewDao.delete(args.id)
+        print('review remove complete!')
         return {'code' :0, 'message' : 'Success'}, 200
 
-class ReviewSearchByEmail(Resource):
-       
-    @staticmethod
-    def get(writer):
-        try:
-            review = ReviewDao.find_by_email(writer)
-            if review:
-                return review.json(), 200
-        except Exception as e:
-            return {'message': 'review not found'}, 404 
-
+        
 class Reviews(Resource): 
 
     @staticmethod
     def get():
         df = pd.read_sql_table('reviews', engine.connect()) 
-        return json.loads(df.to_json(orient = 'records'))
+        return json.loads(df.iloc[::-1].to_json(orient = 'records'))
 
     @staticmethod
     def post():
