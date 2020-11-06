@@ -6,8 +6,8 @@ from mangotoeic.resource.legacy import LegacyDao
 from flask_cors import CORS
 from mangotoeic.resource.review import ReviewDao
 from mangotoeic.resource.user import User, Users, UserDto, UserDao
-from mangotoeic.resource.testresult import TestResultDao, TestResultDto, TestResult
-from mangotoeic.resource.vocablist import VocablistDao
+from mangotoeic.resource.testresult import TestResultDao, TestResultDto, TestResult, TestResults, Lgbm
+from mangotoeic.resource.vocablist import VocablistDto, VocablistDao
 from mangotoeic.resource.vocab import VocabDao 
 from mangotoeic.resource.vocabdict import VocabdictDao
 from mangotoeic.resource.recommendation import RecommendationDao
@@ -89,6 +89,7 @@ with app.app_context():
     print(f'*****PredictMF Total Count is {predict_count} *****')
     if predict_count[0] == 0 :
         PredictMFDao.bulk()
+
 
 initialize_routes(api)
  
