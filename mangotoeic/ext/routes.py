@@ -60,6 +60,7 @@ api = Api(review2)
 api = Api(reviews) 
 api = Api(selectedqs)
 api = Api(minitests)
+
 def initialize_routes(api):
     api.add_resource(Home, '/api')
     api.add_resource(User, '/api/user')
