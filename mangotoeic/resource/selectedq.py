@@ -82,7 +82,7 @@ class SelectedQs(Resource):
     def get():
         data = SelectedQDao.give_random_five_problem()
         
-        print(data)
+        # print(data)
         return data, 200
 if __name__ == "__main__":
     pro = SelectedQDao()

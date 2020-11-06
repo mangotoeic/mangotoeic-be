@@ -5,6 +5,7 @@ import pandas as pd
 from flask import request
 from mangotoeic.resource.recommendation import RecommendationDao, RecommendationDto
 from mangotoeic.resource.predictMF import PredictMFDto 
+from mangotoeic.resource.legacy import LegacyDto
 import random
 class MinitestDto(db.Model):
     __tablename__ = "minitest"
@@ -60,6 +61,7 @@ class Minitests(Resource):
     @staticmethod
     def post():
         body =request.get_json()
+        print(body)
         MinitestDao.bulk(body)
         MinitestDao.get_average()
         df=RecommendationDao.pivot_table_build()
@@ -117,9 +119,11 @@ class Minitests(Resource):
         samplelists= random.sample(mylist2,5)
         mylist3=[]
         for samplelist in samplelists:
-            mylist3.append(samplelist.json)
-        return mylist3 , 200
+            legacydto=LegacyDto.query.filter_by(qId=samplelist.qId).first()
+            mylist3.append(legacydto.json)
         
+        return mylist3 , 200
+
 
     
         
