@@ -81,7 +81,7 @@ def initialize_routes(api):
     api.add_resource(Vocab, '/api/vocab/<int:id>')
     api.add_resource(Access, '/api/access')
     api.add_resource(Auth, '/api/auth')
-    api.add_resource(TestResult, '/api/testresult')
+    api.add_resource(TestResult, '/api/testresult/<int:id>')
     api.add_resource(TestResults, '/api/testresults')
     api.add_resource(PreInfo, '/api/preinfo')
     api.add_resource(Profile, '/api/profile/<int:id>')

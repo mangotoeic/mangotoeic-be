@@ -168,8 +168,13 @@ class TestResultDao(TestResultDto):
 
 
 class TestResult(Resource):
-    pass
-
+    @staticmethod
+    def get(id):
+        
+        TestResultDao.get_average()
+        data=db.session.query(TestResultDto).filter_by(user_id=id).first
+        print(data)
+        # return data.user_avg, 200
 
 class TestResults(Resource):
     @staticmethod
@@ -179,10 +184,10 @@ class TestResults(Resource):
         # df=pd.DataFrame.from_dict(body)
         TestResultDao.add_testresult(body)
         TestResultDao.get_average()
-        print(Lgbm.predict())
-        # data=TestResultDto.query.filter_by(user_id=body['user_id']).first()
-        # return data.user_avg, 200
-        return {'id': "good"}, 200
+        # print(Lgbm.predict())
+        data=TestResultDto.query.filter_by(user_id=body['user_id']).first()
+        return data.user_avg, 200
+        # return {'id': "good"}, 200
 
 
 class Lgbm():
