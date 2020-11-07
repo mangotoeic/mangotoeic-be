@@ -172,9 +172,9 @@ class TestResult(Resource):
     def get(id):
         
         TestResultDao.get_average()
-        data=db.session.query(TestResultDto).filter_by(user_id=id).first
+        data=db.session.query(TestResultDto).filter_by(user_id=id).first()
         print(data)
-        # return data.user_avg, 200
+        return data.user_avg, 200
 
 class TestResults(Resource):
     @staticmethod
