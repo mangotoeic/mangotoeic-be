@@ -24,6 +24,7 @@ class UserDto(db.Model):
     password = db.Column(db.String(20))
     email = db.Column(db.String(20))
     odap = db.relationship("OdapDto", backref='user',lazy=True)
+    bookmark = db.relationship("BookmarkDto", backref='user',lazy=True)
     recommendation = db.relationship("RecommendationDto", backref='user',lazy=True)
     minitest = db.relationship("MinitestDto", backref='user',lazy=True)
     

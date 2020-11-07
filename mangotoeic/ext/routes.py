@@ -5,7 +5,7 @@ from mangotoeic.resource.user import User, Users, Auth, Access, Profile
 from mangotoeic.resource.preinfo import PreInfo
 from mangotoeic.home.api import Home
 from mangotoeic.resource.legacy import Legacy, Legacies
-
+from mangotoeic.resource.bookmark import Bookmark, Bookmarks
 from mangotoeic.resource.newq import NewQ , NewQs
 from mangotoeic.resource.recommendation import Recommendation
 from mangotoeic.resource.odap import Odap, Odaps
@@ -19,6 +19,9 @@ legacy = Blueprint('legacy', __name__, url_prefix='/api/legacy')
 
 odaps = Blueprint('odaps', __name__, url_prefix='/api/odaps')
 odap = Blueprint('odap', __name__, url_prefix='/api/odap')
+
+bookmark = Blueprint('bookmark', __name__, url_prefix='/api/bookmark')
+bookmarks = Blueprint('bookmarks', __name__, url_prefix='/api/bookmarks/<int:id>')
 
 vocabs = Blueprint('vocabs', __name__, url_prefix='/api/vocabs')
 vocab = Blueprint('vocab', __name__, url_prefix='/api/vocab/<int:id>')
@@ -46,6 +49,8 @@ api = Api(legacy)
 api = Api(legacies)
 api = Api(odaps)
 api = Api(odap)
+api = Api(bookmarks)
+api = Api(bookmark)
 api = Api(vocabs)
 api = Api(vocab)
 api = Api(user)
@@ -71,6 +76,8 @@ def initialize_routes(api):
     api.add_resource(Legacies, '/api/legacies')
     api.add_resource(Odaps, '/api/odaps')
     api.add_resource(Odap, '/api/odap')
+    api.add_resource(Bookmark, '/api/bookmark')
+    api.add_resource(Bookmarks, '/api/bookmarks/<int:id>')
     api.add_resource(Vocabs, '/api/vocabs')
     api.add_resource(Vocab, '/api/vocab/<int:id>')
     api.add_resource(Access, '/api/access')
@@ -91,6 +98,11 @@ def legacy_api_error(e):
 
 @odap.errorhandler(500)
 def odap_api_error(e):
+    logging.exception('An error occurred during home request. %s' % str(e))
+    return 'An internal error occurred.', 500
+
+@bookmark.errorhandler(500)
+def bookmark_api_error(e):
     logging.exception('An error occurred during home request. %s' % str(e))
     return 'An internal error occurred.', 500
 

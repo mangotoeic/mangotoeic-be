@@ -18,6 +18,9 @@ def sel_searching_data(driver, item, vocabdict):
     css='#ac_input'
     bs4Sel.sel_wait_by_css(driver,css)
     element=bs4Sel.sel_get_element_by_css(driver,css)
+    err=bs4Sel.sel_wait_by_css(driver,css)
+    if not err:
+        return vocabdict
     text=item #
     bs4Sel.sel_input_text(driver,element,text)
     css='#searchPage_entry > div > div:nth-child(1) > div > a > strong'
@@ -68,9 +71,9 @@ def sel_searching_data(driver, item, vocabdict):
     # mylist2 = set(mylist1)
     
     vocabdict[item]=mylist1
-    with open(os.path.join(basedir,"data/vocabdict4.pickle"),'wb') as f:
+    with open(os.path.join(basedir,"data/vocabdict6.pickle"),'wb') as f:
         pickle.dump(vocabdict,f)
-    with open(os.path.join(basedir,"data/vocabdict4.pickle"),'rb') as f:
+    with open(os.path.join(basedir,"data/vocabdict6.pickle"),'rb') as f:
         data=pickle.load(f)
     print(data)
     return vocabdict
@@ -111,8 +114,8 @@ class Bs4Sel:
         ActionChains(driver).move_to_element(element).click(element).perform()
     # def sel_find_css()
 if __name__ == '__main__':
-    # driver =webdriver.Chrome(os.path.join(basedir,'chromedriver'))
-    driver =webdriver.PhantomJS('/usr/local/bin/phantomjs')
+    driver =webdriver.Chrome(os.path.join(basedir,'chromedriver'))
+    # driver =webdriver.PhantomJS('/usr/local/bin/phantomjs')
     import pickle
     with open(os.path.join(basedir,"data/data.pickle"),'rb') as f:
         mylist=pickle.load(f)
@@ -125,6 +128,10 @@ if __name__ == '__main__':
         data3 = pickle.load(f)
     with open(os.path.join(basedir,'data/vocabdict3.pickle'), 'rb') as f:
         data4 = pickle.load(f)
+    with open(os.path.join(basedir,'data/vocabdict4.pickle'), 'rb') as f:
+        data5 = pickle.load(f)
+    with open(os.path.join(basedir,'data/vocabdict5.pickle'), 'rb') as f:
+        data6 = pickle.load(f)
     with open(os.path.join(basedir,'data/data.pickle'), 'rb') as f:
         data2 = pickle.load(f)
     vocablist = list(data.keys())
@@ -133,14 +140,18 @@ if __name__ == '__main__':
     vocabset2 = set(vocablist2)
     vocablist3 = list(data4.keys())
     vocabset3 = set(vocablist3)
-    Todoset=data2-vocabset-vocabset2-vocabset3
+    vocablist4 = list(data5.keys())
+    vocabset4 = set(vocablist4)
+    vocablist5 = list(data6.keys())
+    vocabset5 = set(vocablist5)
+    Todoset=data2-vocabset-vocabset2-vocabset3-vocabset4-vocabset5
     vocabdict={}
     mylist =list(Todoset)
     for item in mylist:
         # break
         vocabdict=sel_searching_data(driver, item, vocabdict)    
-    with open(os.path.join(basedir,"data/vocabdict4.pickle"),'wb') as f:
+    with open(os.path.join(basedir,"data/vocabdict6.pickle"),'wb') as f:
         pickle.dump(vocabdict,f)
-    with open(os.path.join(basedir,"data/vocabdict4.pickle"),'rb') as f:
+    with open(os.path.join(basedir,"data/vocabdict6.pickle"),'rb') as f:
         data=pickle.load(f)
     print(data)

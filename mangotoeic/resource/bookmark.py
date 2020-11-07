@@ -12,32 +12,18 @@ basedir= os.path.dirname(os.path.abspath(__file__))
 Session = openSession()
 session = Session()
 
-class OdapPro:
+class BookmarkPro:
     def __init__(self):
         self.fpath =''
-    
-    def hook(self):
-        df=self.fileread()
-        print(df.head())
-        return df
 
-    def fileread(self):
-        df= pd.read_csv(self.fpath,index_col=False,)
-        df = df.drop('Unnamed: 0', axis=1)
-        df = df.rename(index ={0:'vocabId'})
-        
-        return df
-
-class OdapDto(db.Model):
+class BookmarkDto(db.Model):
     
-    __tablename__ = 'odap'
+    __tablename__ = 'bookmark'
     __table_args__={'mysql_collate':'utf8_general_ci'}
     id: int = db.Column(db.Integer, primary_key=True, index=True)
     user_id: int = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    qId: int = db.Column(db.Integer, db.ForeignKey('legacies.qId'))
-    # legacy_id = db.relationship("LegacyDao", back_populates='odap')  
+    qId: int = db.Column(db.Integer, db.ForeignKey('legacies.qId')) 
 
-    
     def __repr__(self):
         return f'user_id={self.user_id}, qId={self.qId}'
 
@@ -48,11 +34,11 @@ class OdapDto(db.Model):
             'qId' : self.qId
         }
 
-class OdapVo:
+class BookmarkVo:
     user_id: int = 0
     qId: int = 0
 
-class OdapDao(OdapDto):
+class BookmarkDao(BookmarkDto):
     
     @classmethod
     def find_all(cls):
@@ -61,26 +47,14 @@ class OdapDao(OdapDto):
         return json.loads(df.to_json(orient='records'))
     
     @classmethod
-    def add_odap(cls, userid, qId, newq):
-        add_odap = cls.query.filter(userid == userid, qId != qId).add(newq)
-        return add_odap
-    
+    def delete_bookmark(cls, user_id, qId):
+        x=BookmarkDto.query.filter_by(user_id = user_id, qId = qId).one()
+        db.session.delete(x)    
+        db.session.commit()
     @classmethod
-    def delete_odap(cls, userid, qId):
-        del_odap = cls.query.filter(userid == userid, qId == qId).delete(qId)
-        return del_odap
-
-    @classmethod
-    def add_odap2(cls,data):
-        user_id= data['user_id']
-        print(user_id)
-        for qid in data['qId']:
-            some_user=UserDto.query.filter_by(user_id=user_id).first()
-            some_question=LegacyDto.query.filter_by(qId=qid).first()
-            print(some_question)
-            print(some_user)
-            x=OdapDto(user=some_user, legacy=some_question)
-            db.session.add(x)    
+    def add_bookmark(cls,user_id,qId):
+        x=BookmarkDto(user_id=user_id, qId=qId)
+        db.session.add(x)    
         db.session.commit()
     
     @classmethod
@@ -90,9 +64,8 @@ class OdapDao(OdapDto):
         return 
     
     @staticmethod   
-    def bulk(data):
-        
-        session.bulk_insert_mappings(OdapDto, data.to_dict(orient="records"))
+    def bulk(data):    
+        session.bulk_insert_mappings(BookmarkDto, data.to_dict(orient="records"))
         session.commit()
         session.close()
     
@@ -100,11 +73,10 @@ class OdapDao(OdapDto):
     def join(cls):
         for u, a in session.query(LegacyDto,cls).\
                     filter(LegacyDto.qId==cls.qId).\
-                    filter(OdapDto.user_id=='16').\
+                    filter(BookmarkDto.user_id=='16').\
                         all():
             print(u)
             print(a)
-        
 
 parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
 parser.add_argument('user_id', type=int, required=True,
@@ -112,19 +84,24 @@ parser.add_argument('user_id', type=int, required=True,
 parser.add_argument('qId', type=int, required=True,
                                         help='This field should be a qId')
 
-class Odap(Resource):
+class Bookmark(Resource):
     @staticmethod    
     def post():
         args = request.get_json()
         print(args)
-        d=UserDto.query.filter_by(user_id=args['user_id']).first()
-        print(d.odap)
-        blist = []
-        for idx, item in enumerate(d.odap):
-            p = LegacyDto.query.filter_by(qId=item.qId).first()
-            blist.append(p.json)
+        d=BookmarkDto.query.filter_by(user_id=args['user_id'],qId=args['qId']).first()
+        if not d:
+            print("None",d)
+            BookmarkDao.add_bookmark(args['user_id'],args['qId'])
+        if d:
+            print("True",d)
+            BookmarkDao.delete_bookmark(args['user_id'],args['qId'])
+        bookmarkdtos=BookmarkDto.query.all()
+        mylist =[]
+        for dto in bookmarkdtos:
+            mylist.append(dto.json)
 
-        return blist , 200
+        return mylist , 200
     
     @staticmethod
     def update():
@@ -138,32 +115,17 @@ class Odap(Resource):
         print(f'Question {args["id"]} deleted')
         return {'code':0, 'message':'SUCCESS'}, 200
 
-class Odaps(Resource):
-    def get(self):
-        data = OdapDao.fetch_all()
+class Bookmarks(Resource):
+    def get(id):
+        data = BookmarkDao.fetch_all(id)
         return data, 200
 
     def post(self):
         body = request.get_json()
-
-        # print(body)
-        # df=pd.DataFrame.from_dict(body)
-        OdapDao.add_odap2(body)
-
+        BookmarkDao.add_odap2(body)
         return {'id': "good"}, 200
     
-    #{'user_id': None, 'qId': [2, 3, 4]}
-
-        
+    #{'user_id': None, 'qId': [2, 3, 4]}        
 if __name__ == '__main__':
-    # association_table= db.Table('association', db.metadata,db.Column('legacies',db.Integer,db.ForeignKey('legacies.qId')))
-    # print(type(association_table))
-    # for t in db.metadata.sorted_tables:
-    #     print(t.name)
-    # for c in association_table.c:
-    #     print(c)
-    # association_table.create(engine,checkfirst=True)
-    # OdapDao.with_parents()
-    # # print(OdapDto.legacy)
-    dao = OdapDao
+    dao = BookmarkDao
     dao.fetch_all(16)
