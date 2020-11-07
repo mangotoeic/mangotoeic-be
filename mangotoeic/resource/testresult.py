@@ -1,3 +1,4 @@
+import lightgbm
 from flask.globals import session
 import pandas as pd
 from flask import request
@@ -10,6 +11,7 @@ from mangotoeic.ext.db import Base
 from mangotoeic.resource.user import UserDto
 from mangotoeic.resource.legacy import LegacyDto
 import json
+import joblib
 
 # 토익 시험 몇번 봤는지, 목표점수, 시험날짜, 본인의 영어실력 입력
 # 데이터 베이스에 반영할 건지?
@@ -26,6 +28,7 @@ class TestResultDto(db.Model):
     user_answer = db.Column(db.Integer)
     answered_correctly = db.Column(db.Float)
     prior_question_elapsed_time = db.Column(db.Float)
+    prior_question_had_explanation = db.Column(db.Boolean, default=True)
     user_avg = db.Column(db.Float)
 
     # def __init__(self, id=0, user_id=0, qId=0, user_answer=0, answered_correctly=0.0, prior_question_elapsed_time=0.0, timestamp=0):
@@ -40,7 +43,7 @@ class TestResultDto(db.Model):
     def __repr__(self):
         return f'user_id={self.user_id}, qId={self.qId},\
                 user_answer={self.user_answer}, answered_correctly={self.answered_correctly},\
-                prior_question_elapsed_time={self.prior_question_elapsed_time}'
+                prior_question_elapsed_time={self.prior_question_elapsed_time}, prior_question_had_explanation={self.prior_question_had_explanation}'
 
 
     @property
@@ -53,6 +56,7 @@ class TestResultDto(db.Model):
             'user_answer' : self.user_answer,
             'answered_correctly': self.answered_correctly,
             'prior_question_elapsed_time': self.prior_question_elapsed_time,
+            'prior_question_had_explanation':self.prior_question_had_explanation,
             'user_avg' : self.user_avg
         }
         
@@ -135,7 +139,6 @@ class TestResultDao(TestResultDto):
         prior_question_elapsed_time = data['prior_question_elapsed_time']
         answered_correctly = data['answered_correctly']
         user_answer = data['user_answer']
-        print(user_id)
         for idx ,qid in enumerate(data['qId']):
             some_question=LegacyDto.query.filter_by(qId=qid).first()
             print(some_question)
@@ -143,7 +146,7 @@ class TestResultDao(TestResultDto):
             x=TestResultDto(user_id=user_id, timestamp=timestamp[idx], \
                 prior_question_elapsed_time=prior_question_elapsed_time[idx], \
                     answered_correctly=answered_correctly[idx], user_answer=user_answer[idx],\
-                        legacy2=some_question)
+                        legacy=some_question)
             db.session.add(x)    
         db.session.commit()
         db.session.close()
@@ -165,8 +168,13 @@ class TestResultDao(TestResultDto):
 
 
 class TestResult(Resource):
-    pass
-
+    @staticmethod
+    def get(id):
+        
+        TestResultDao.get_average()
+        data=db.session.query(TestResultDto).filter_by(user_id=id).first()
+        print(data)
+        return data.user_avg, 200
 
 class TestResults(Resource):
     @staticmethod
@@ -176,8 +184,96 @@ class TestResults(Resource):
         # df=pd.DataFrame.from_dict(body)
         TestResultDao.add_testresult(body)
         TestResultDao.get_average()
+        # print(Lgbm.predict())
         data=TestResultDto.query.filter_by(user_id=body['user_id']).first()
         return data.user_avg, 200
+        # return {'id': "good"}, 200
+
+
+class Lgbm():
+    features = [
+            'mean_user_accuracy', 
+            'questions_answered',
+            'std_user_accuracy', 
+            'median_user_accuracy',
+            'skew_user_accuracy',
+            'mean_accuracy', 
+            'question_asked',
+            'std_accuracy', 
+            'median_accuracy',
+            'prior_question_elapsed_time', 
+            'prior_question_had_explanation',
+            'skew_accuracy'
+        ]
+    target = 'answered_correctly'
+
+    @staticmethod
+    def data_prepro():
+        testresult_df = pd.read_sql_table('testresult', engine.connect())
+        testresult_df.rename(columns={'qId':'content_id'}, inplace=True) 
+
+        grouped_by_user_df = testresult_df.groupby('user_id')
+        user_answers_df = grouped_by_user_df.agg({'answered_correctly': ['mean', 'count', 'std', 'median', 'skew']}).copy()
+        user_answers_df.columns = ['mean_user_accuracy', 'questions_answered', 'std_user_accuracy', 'median_user_accuracy', 'skew_user_accuracy']
+
+        grouped_by_content_df = testresult_df.groupby('content_id')
+        content_answers_df = grouped_by_content_df.agg({'answered_correctly': ['mean', 'count', 'std', 'median', 'skew'] }).copy()
+        content_answers_df.columns = ['mean_accuracy', 'question_asked', 'std_accuracy', 'median_accuracy', 'skew_accuracy']
+
+        testresult_df = testresult_df.merge(user_answers_df, how='left', on='user_id')
+        testresult_df = testresult_df.merge(content_answers_df, how='left', on='content_id')
+
+        testresult_df = testresult_df[Lgbm().features + [Lgbm().target]]
+        return testresult_df
+
+
+    @staticmethod
+    def fit():
+        lgbm = Lgbm()
+        testresult_df = lgbm.data_prepro()
+        params = {
+            'bagging_fraction': 0.1817242323514327,
+            'feature_fraction': 0.1884588361650144,
+            'learning_rate': 0.12887924851375825, 
+            'max_depth': -1,
+            'min_child_samples': 20, 
+            'min_data_in_leaf': 1, 
+            'n_estimators': 100,
+            'num_leaves': 2,
+        }
+        model = lightgbm.LGBMClassifier(**params)
+        load_model = joblib.load('./mangotoeic/resource/data/lgb_test.pkl')
+        new_model = model.fit(testresult_df[Lgbm().features], testresult_df[Lgbm().target], init_model=load_model)
+        joblib.dump(new_model, 'lgb_test2.pkl')
+        return new_model
+
+    @staticmethod
+    def predict():
+        lgbm = Lgbm()
+        new_model = lgbm.fit()
+        test_df = pd.read_csv('./mangotoeic/resource/data/example_test5.csv')
+        user_answer_df = pd.read_csv('./mangotoeic/resource/data/user_answer_df.csv')
+        content_answer_df = pd.read_csv('./mangotoeic/resource/data/content_answer_df.csv')
+        test_df = test_df.merge(user_answer_df, how = 'left', on = 'user_id')
+        test_df = test_df.merge(content_answer_df, how = 'left', on = 'content_id')
+        test_df['user_id'] = 17 # 리액트에서 받아오는 user_id로 변경해야함
+        test_df['answered_correctly'] = new_model.predict_proba(test_df[Lgbm().features])[:,1]
+        test_df = test_df[['row_id', 'user_id', 'content_id', 'answered_correctly']]
+        result_group_by = test_df.groupby('user_id')
+        result_groupby_user_answer = result_group_by.agg({'answered_correctly': ['mean']}).copy()
+        result_groupby_user_answer.columns = ['mean_user_accuracy']
+        print(result_groupby_user_answer)
+        return result_groupby_user_answer
+
+
+
+
+
+
+
+        # load_model = joblib.load('./data/lgb_test.pkl')
+
+        
 
 
     # def post():
