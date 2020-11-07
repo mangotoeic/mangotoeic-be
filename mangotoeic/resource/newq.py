@@ -4,6 +4,7 @@ from flask_restful import Resource
 import os
 import sys
 import torch
+from flask import request
 import random
 import argparse
 import numpy as np
@@ -132,7 +133,11 @@ class NewQDao(NewQDto):
         prelist=NewQDao.seperate_txt(generated_txt_set)  
         questions,ansAs,ansBs,ansCs,ansDs, answers =NewQDao.text_to_newq(prelist)
         NewQDao.add(questions, ansAs, ansBs , ansCs , ansDs, answers)
-        
+        mylist =[]
+        for question in questions:
+            newqdto=NewQDto.query.filter_by(question=question).first()
+            mylist.append(newqdto.json)
+        return mylist
     @staticmethod
     def add(questions, ansAs, ansBs , ansCs , ansDs, answers):
         for question, ansA, ansB, ansC, ansD, answer in zip(questions, ansAs, ansBs , ansCs , ansDs, answers):
@@ -156,8 +161,12 @@ class NewQDao(NewQDto):
 class NewQ(Resource):
     pass
 class NewQs(Resource):
-    pass
-        
+    @staticmethod
+    def post():
+        body=request.get_json()
+        text=body['text']
+        mylist=NewQDao.hook(text)        
+        return mylist , 200
         
 
 if __name__ == '__main__':

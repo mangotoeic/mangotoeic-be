@@ -15,6 +15,7 @@ from mangotoeic.resource.review import Review, Review2, Reviews
 from mangotoeic.resource.selectedq import SelectedQs
 from mangotoeic.resource.minitest import Minitest,Minitests
 from mangotoeic.resource.nextminiset import NextMiniSet
+newqs = Blueprint('newqs', __name__, url_prefix='/api/newqs')
 legacies = Blueprint('legacies', __name__, url_prefix='/api/legacies')
 legacy = Blueprint('legacy', __name__, url_prefix='/api/legacy')
 
@@ -63,6 +64,7 @@ api = Api(reviews)
 api = Api(selectedqs)
 api = Api(minitests)
 api = Api(nextminiset)
+api = Api(newqs)
 
 def initialize_routes(api):
     api.add_resource(Home, '/api')
@@ -86,6 +88,7 @@ def initialize_routes(api):
     api.add_resource(SelectedQs, '/api/selectedqs')
     api.add_resource(Minitests, '/api/minitests')
     api.add_resource(NextMiniSet, '/api/nextminiset/<int:id>')
+    api.add_resource(NewQs, '/api/newqs')
 
 
     
