@@ -59,10 +59,19 @@ class BookmarkDao(BookmarkDto):
     
     @classmethod
     def fetch_all(cls, userid):
-        some_user=UserDto.query.filter_by(user_id=userid).first()
-        print(some_user)
-        return 
-    
+        bookmarkdtos=BookmarkDto.query.filter_by(user_id=userid).all()
+        mylist =[]
+        for item in bookmarkdtos:
+            legacydto=LegacyDto.query.filter_by(qId=item.qId).first()
+            mylist.append(legacydto.json)
+        return mylist
+    @classmethod
+    def fetch_all_to_odap(cls, userid):
+        bookmarkdtos=BookmarkDto.query.filter_by(user_id=userid).all()
+        mylist =[]
+        for item in bookmarkdtos:
+            mylist.append(item.qId)
+        return mylist
     @staticmethod   
     def bulk(data):    
         session.bulk_insert_mappings(BookmarkDto, data.to_dict(orient="records"))
@@ -96,12 +105,13 @@ class Bookmark(Resource):
         if d:
             print("True",d)
             BookmarkDao.delete_bookmark(args['user_id'],args['qId'])
-        bookmarkdtos=BookmarkDto.query.all()
-        mylist =[]
-        for dto in bookmarkdtos:
-            mylist.append(dto.json)
-
-        return mylist , 200
+        # bookmarkdtos=BookmarkDto.query.all()
+        # mylist =[]
+        # for dto in bookmarkdtos:
+        #     mylist.append(dto.json)
+        data= BookmarkDao.fetch_all_to_odap(args['user_id'])
+        print(data)
+        return data , 200
     
     @staticmethod
     def update():
@@ -116,6 +126,7 @@ class Bookmark(Resource):
         return {'code':0, 'message':'SUCCESS'}, 200
 
 class Bookmarks(Resource):
+    @staticmethod
     def get(id):
         data = BookmarkDao.fetch_all(id)
         return data, 200
@@ -123,8 +134,14 @@ class Bookmarks(Resource):
     def post(self):
         body = request.get_json()
         BookmarkDao.add_odap2(body)
+        
         return {'id': "good"}, 200
-    
+class BookmarksToOdap(Resource):
+    @staticmethod
+    def get(id):
+     
+        data= BookmarkDao.fetch_all_to_odap(id)
+        return data, 200    
     #{'user_id': None, 'qId': [2, 3, 4]}        
 if __name__ == '__main__':
     dao = BookmarkDao
