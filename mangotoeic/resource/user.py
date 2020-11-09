@@ -159,6 +159,15 @@ class User(Resource):
         #     return {'code' : 0, 'message' : 'SUCCESS'}, 200    
         # except:
         #     return {'message': 'An error occured inserting the user'}, 500
+    
+    @staticmethod
+    def get(): 
+        Session = openSession()
+        session = Session()
+        result = session.execute('select count(*) from users;')
+        data = result.first()
+        result = int(data[0])  
+        return result, 200
 
     # @staticmethod
     # def get():

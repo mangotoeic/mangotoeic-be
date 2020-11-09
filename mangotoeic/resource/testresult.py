@@ -10,6 +10,7 @@ from mangotoeic.ext.db import db, openSession, engine
 from mangotoeic.ext.db import Base
 from mangotoeic.resource.user import UserDto
 from mangotoeic.resource.legacy import LegacyDto
+from flask import jsonify
 import json
 import joblib
 
@@ -156,6 +157,9 @@ class TestResult(Resource):
         print(user_pred_score)
         print(data)
         return [data.user_avg, user_pred_score], 200
+    
+    
+        
 
 class TestResults(Resource):
     @staticmethod
@@ -166,6 +170,14 @@ class TestResults(Resource):
         TestResultDao.add_testresult(body)
         TestResultDao.get_average()
 
+    @staticmethod
+    def get():
+        Session = openSession()
+        session = Session()
+        result = session.execute('select avg(user_avg) from testresult;')
+        data = result.first()
+        result = round(data[0] * 1000)
+        return result, 200
 
 class Lgbm():
     features = [

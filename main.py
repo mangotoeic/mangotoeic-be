@@ -78,6 +78,8 @@ with app.app_context():
     print(f'***** TestResult Total Count is {testresult_count} *****')
     if testresult_count[0] == 0:
         TestResultDao.bulk()
+    else: 
+        TestResultDao.get_average()
     
     review_count = ReviewDao.count()
     print(f'***** Review Total Count is {review_count} *****')
