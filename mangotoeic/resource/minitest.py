@@ -116,7 +116,7 @@ class Minitests(Resource):
         for mfdto in mfdtos:
             # mfdto중 가장 중간 오답률을 찾는다
             difference=median-mfdto.correctAvg
-            if abs(difference)>0.25:
+            if abs(difference)>0.5:
                 continue
             if difference < 0: #맞출확률이 높다면
                 x=random.randint(0,1)
