@@ -13,8 +13,9 @@ from mangotoeic.resource.vocabdict import VocabdictDao
 from mangotoeic.resource.recommendation import RecommendationDao
 from mangotoeic.resource.selectedq import SelectedQDao
 from mangotoeic.resource.predictMF import PredictMFDao
+from mangotoeic.resource.predictvocab import PredictVocabDao
 from mangotoeic.resource.minitest import Minitests
-
+from mangotoeic.resource.vocabrcm import VocabRcdDao
 import json
 
 app = Flask(__name__)
@@ -68,6 +69,11 @@ with app.app_context():
     print(f'***** Vocab Total Count is {vocab_count} *****')
     if vocab_count[0] == 0:
         VocabDao.bulk()
+    
+    vocabpredict_count = PredictVocabDao.count()
+    print(f'***** Vocab Predict Total Count is {vocabpredict_count} *****')
+    if vocabpredict_count[0] == 0:
+        PredictVocabDao.bulk()
 
     user_count = UserDao.count()
     print(f'***** Users Total Count is {user_count} *****')
@@ -91,5 +97,6 @@ with app.app_context():
     print(f'*****PredictMF Total Count is {predict_count} *****')
     if predict_count[0] == 0 :
         PredictMFDao.bulk()
+    VocabRcdDao.set_datas_from_user_id(16)
 initialize_routes(api)
  
