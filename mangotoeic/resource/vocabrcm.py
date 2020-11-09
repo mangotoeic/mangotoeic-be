@@ -152,11 +152,11 @@ class VocabRcdDao(VocabRcdDto):
             df2= pd.read_sql(q.statement,q.session.bind)
             mylist=df2.vocab.to_list()
             print(mylist)
-            print(df.vocab.isin(mylist))
-            df=df.loc[df.vocab.isin(mylist)]
+            print(~df.vocab.isin(mylist))
+            df=df.loc[~df.vocab.isin(mylist)]
             print(df)
             VocabRcdDao.bulk(df)
-            break
+            # break
         VocabRcdDao.get_average()
         VocabRcdDao.get_average2()
         
