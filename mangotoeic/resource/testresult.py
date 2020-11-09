@@ -92,6 +92,14 @@ class TestResultDao(TestResultDto):
         session.bulk_insert_mappings(TestResultDto, df.to_dict(orient="records"))
         session.commit()
         session.close()
+    @staticmethod
+    def bulk2(df):
+        Session = openSession()
+        session = Session()
+        session.bulk_insert_mappings(TestResultDto, df.to_dict(orient="records"))
+        session.commit()
+        session.close()
+
 
     @classmethod
     def find_all(cls):
@@ -133,48 +141,21 @@ class TestResultDao(TestResultDto):
 
     @staticmethod
     def add_testresult(data):
-        print(data)
-        user_id= data['user_id']
-        timestamp = data['timestamp']
-        prior_question_elapsed_time = data['prior_question_elapsed_time']
-        answered_correctly = data['answered_correctly']
-        user_answer = data['user_answer']
-        for idx ,qid in enumerate(data['qId']):
-            some_question=LegacyDto.query.filter_by(qId=qid).first()
-            print(some_question)
-
-            x=TestResultDto(user_id=user_id, timestamp=timestamp[idx], \
-                prior_question_elapsed_time=prior_question_elapsed_time[idx], \
-                    answered_correctly=answered_correctly[idx], user_answer=user_answer[idx],\
-                        legacy=some_question)
-            db.session.add(x)    
-        db.session.commit()
-        db.session.close()
-
-    # @staticmethod
-    # def modify_user(user):
-    #     Session = openSession()
-    #     session = Session()
-    #     session.add(user)
-    #     session.commit()
-
-    # @classmethod
-    # def delete_user(cls,id):
-    #     Session = openSession()
-    #     session = Session()
-    #     data = cls.query.get(user_id)
-    #     session.delete(data)
-    #     session.commit()
-
-
+        
+        df=pd.DataFrame(data)
+        print(df)
+        TestResultDao.bulk2(df)
+      
 class TestResult(Resource):
     @staticmethod
     def get(id):
-        
-        TestResultDao.get_average()
+        # TestResultDao.get_average()
         data=db.session.query(TestResultDto).filter_by(user_id=id).first()
+        pred_score = Lgbm.predict(id)
+        user_pred_score = pred_score.iloc[0, 0]
+        print(user_pred_score)
         print(data)
-        return data.user_avg, 200
+        return [data.user_avg, user_pred_score], 200
 
 class TestResults(Resource):
     @staticmethod
@@ -184,10 +165,6 @@ class TestResults(Resource):
         # df=pd.DataFrame.from_dict(body)
         TestResultDao.add_testresult(body)
         TestResultDao.get_average()
-        # print(Lgbm.predict())
-        data=TestResultDto.query.filter_by(user_id=body['user_id']).first()
-        return data.user_avg, 200
-        # return {'id': "good"}, 200
 
 
 class Lgbm():
@@ -248,21 +225,22 @@ class Lgbm():
         return new_model
 
     @staticmethod
-    def predict():
+    def predict(id):
         lgbm = Lgbm()
         new_model = lgbm.fit()
-        test_df = pd.read_csv('./mangotoeic/resource/data/example_test5.csv')
+        test_df = pd.read_csv('./mangotoeic/resource/data/example_test6.csv')
         user_answer_df = pd.read_csv('./mangotoeic/resource/data/user_answer_df.csv')
         content_answer_df = pd.read_csv('./mangotoeic/resource/data/content_answer_df.csv')
         test_df = test_df.merge(user_answer_df, how = 'left', on = 'user_id')
         test_df = test_df.merge(content_answer_df, how = 'left', on = 'content_id')
-        test_df['user_id'] = 17 # 리액트에서 받아오는 user_id로 변경해야함
+        test_df['user_id'] = id # 리액트에서 받아오는 user_id로 변경해야함
+        print(test_df)
         test_df['answered_correctly'] = new_model.predict_proba(test_df[Lgbm().features])[:,1]
         test_df = test_df[['row_id', 'user_id', 'content_id', 'answered_correctly']]
         result_group_by = test_df.groupby('user_id')
         result_groupby_user_answer = result_group_by.agg({'answered_correctly': ['mean']}).copy()
         result_groupby_user_answer.columns = ['mean_user_accuracy']
-        print(result_groupby_user_answer)
+        # print(result_groupby_user_answer)
         return result_groupby_user_answer
 
 

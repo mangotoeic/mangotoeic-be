@@ -13,8 +13,9 @@ from mangotoeic.resource.vocab import Vocab, Vocabs
 from mangotoeic.resource.testresult import TestResult, TestResults
 from mangotoeic.resource.review import Review, Review2, Reviews
 from mangotoeic.resource.selectedq import SelectedQs
-from mangotoeic.resource.minitest import Minitest,Minitests
+from mangotoeic.resource.minitest import Minitest, Minitests
 from mangotoeic.resource.nextminiset import NextMiniSet
+
 newqs = Blueprint('newqs', __name__, url_prefix='/api/newqs')
 legacies = Blueprint('legacies', __name__, url_prefix='/api/legacies')
 legacy = Blueprint('legacy', __name__, url_prefix='/api/legacy')
