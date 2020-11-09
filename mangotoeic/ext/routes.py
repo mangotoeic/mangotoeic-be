@@ -15,6 +15,7 @@ from mangotoeic.resource.review import Review, Review2, Reviews
 from mangotoeic.resource.selectedq import SelectedQs
 from mangotoeic.resource.minitest import Minitest, Minitests
 from mangotoeic.resource.nextminiset import NextMiniSet
+from mangotoeic.resource.vocabrcm import VocabRcds, VocabBulk
 
 newqs = Blueprint('newqs', __name__, url_prefix='/api/newqs')
 legacies = Blueprint('legacies', __name__, url_prefix='/api/legacies')
@@ -29,6 +30,8 @@ bookmarkstoodap = Blueprint('bookmarkstoodap', __name__, url_prefix='/api/bookma
 
 vocabs = Blueprint('vocabs', __name__, url_prefix='/api/vocabs')
 vocab = Blueprint('vocab', __name__, url_prefix='/api/vocab/<int:id>')
+vocabrcds = Blueprint('vocabrcds', __name__, url_prefix='/api/vocabrcds/<int:id>')
+vocabbulk = Blueprint('vocabbulk', __name__, url_prefix='/api/vocabbulk/<int:id>')
 
 user = Blueprint('user', __name__, url_prefix='/api/user')
 users = Blueprint('users', __name__, url_prefix='/api/users')
@@ -60,6 +63,8 @@ api = Api(bookmarkstoodap)
 api = Api(bookmark)
 api = Api(vocabs)
 api = Api(vocab)
+api = Api(vocabrcds)
+api = Api(vocabbulk)
 api = Api(user)
 api = Api(users)
 api = Api(access)
@@ -92,6 +97,8 @@ def initialize_routes(api):
     api.add_resource(BookmarksToOdap, '/api/bookmarks-to-odap/<int:id>')
     api.add_resource(Vocabs, '/api/vocabs')
     api.add_resource(Vocab, '/api/vocab/<int:id>')
+    api.add_resource(VocabRcds, '/api/vocabrcds/<int:id>')
+    api.add_resource(VocabBulk, '/api/vocabbulk/<int:id>')
     api.add_resource(Access, '/api/access')
     api.add_resource(Auth, '/api/auth')
     api.add_resource(TestResult, '/api/testresult/<int:id>')

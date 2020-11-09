@@ -124,12 +124,17 @@ class VocabRcdVo:
     correctAvg: float = 0.0
 class VocabRcdDao(VocabRcdDto):
     @staticmethod
+    def hook2(id):
+
+        VocabRcdDao.set_datas_from_user_id(id)
+        
+    @staticmethod
     def hook(id):
 
         VocabRcdDao.set_datas_from_user_id(id)
         dtos=VocabRcdDao.get_dtos_from_user_id(id)
-        rcds=VocabRcdDao.rcd(dtos)
-
+        mylist=VocabRcdDao.rcd(dtos,id)
+        return mylist
     @staticmethod
     def set_datas_from_user_id(id):
         testresult_dtos=TestResultDto.query.filter_by(user_id=id).all()
@@ -143,7 +148,15 @@ class VocabRcdDao(VocabRcdDto):
             corpus =re.sub(regex,answer,question)
             print(corpus)
             df=VocabRcdPro.lemmatized(corpus,id,qId)
+            q=VocabRcdDto.query.filter_by(user_id=id)
+            df2= pd.read_sql(q.statement,q.session.bind)
+            mylist=df2.vocab.to_list()
+            print(mylist)
+            print(df.vocab.isin(mylist))
+            df=df.loc[df.vocab.isin(mylist)]
+            print(df)
             VocabRcdDao.bulk(df)
+            break
         VocabRcdDao.get_average()
         VocabRcdDao.get_average2()
         
@@ -152,6 +165,7 @@ class VocabRcdDao(VocabRcdDto):
         db.session.execute('update vocabrcd as t inner join (select user_id, avg(answered_correctly) as av from testresult group by user_id ) t1 on t.user_id = t1.user_id set t.user_avg= t1.av;')
         db.session.commit()
         db.session.close()
+
     @staticmethod
     def get_average2():
         db.session.execute('update vocabrcd as t inner join (select user_id,qid, avg(answered_correctly) as av from testresult group by user_id, qId ) t1 on t.user_id = t1.user_id and t.qId= t1.qId  set t.correctAvg= t1.av;')
@@ -162,42 +176,44 @@ class VocabRcdDao(VocabRcdDto):
     def get_dtos_from_user_id(id):
         vocabrcddtos=db.session.query(VocabRcdDto).filter_by(user_id=id).all()
         return vocabrcddtos
+
     @staticmethod   
     def bulk(df):
         Session = openSession()
         session = Session()
-        print(df.head())
+        # print(df.head())
         session.bulk_insert_mappings(VocabRcdDto, df.to_dict(orient="records"))
         session.commit()
         session.close()
+
     @staticmethod
     def rcd(dtos,id):
         users=UserDto.query.all()
         # print(users)
-        minvalue= 100
+        minvalue= 100000
         minuser=None
         for user in users:
-            if user>=17:
+            if user.user_id>=16:
                 continue
             rcddtos=VocabDto.query.filter_by(user_id=user.user_id).all()
             # print(rcddtos)
             mylist=[]
             for dto in dtos:
-                mylist.append(dto.qId)
+                mylist.append(dto.vocab)
             minis=dtos
             for mini in minis:
-                mylist.append(mini.qId)
+                mylist.append(mini.vocab)
             
             mylist = set(mylist)
             sum =0
             for rcditm in rcddtos:
-                if rcditm.qId in mylist:
+                if rcditm.vocab in mylist:
                     # print("=="*100,rcditm)
-                    minidto =VocabRcdDto.query.filter_by(user_id=id,qId=rcditm.qId).first()
+                    minidto =VocabRcdDto.query.filter_by(user_id=id,vocab=rcditm.vocab).first()
                     # print(minidto)
                     value=abs(rcditm.correctAvg-minidto.correctAvg)
                     sum+=value
-                elif not rcditm.qId in mylist:
+                elif not rcditm.vocab in mylist:
                     sum2=0
                     count=0
                     for rcditm2 in rcddtos:
@@ -227,7 +243,7 @@ class VocabRcdDao(VocabRcdDto):
         for mfdto in mfdtos:
             # mfdto중 가장 중간 오답률을 찾는다
             difference=median-mfdto.correctAvg
-            if abs(difference)>0.15:
+            if abs(difference)>0.01:
                 continue
             if difference < 0: #맞출확률이 높다면
                 x=random.randint(0,1)
@@ -236,13 +252,31 @@ class VocabRcdDao(VocabRcdDto):
                 if x==1:
                     pass
             mylist2.append(mfdto)
-        mylist3=[]
+        
+        mylist4=[]
         for item in mylist2:
-            vocabdictdto=VocabdictDto.query.filter_by(vocab=item.vocab).all()
-            mylist3.append(vocabdictdto.json)
-        print(mylist3)
- 
-        return mylist3
+            vocabdictdtos=VocabdictDto.query.filter_by(vocab=item.vocab).all()
+            mylist3=[]
+            mydict={}
+            for vocabdictdto in vocabdictdtos:
+                jsonobj=vocabdictdto.json
+                mylist3.append(jsonobj['meaning'])
+                print(jsonobj)
+                vocab=jsonobj['vocab']
+                mydict[vocab]= mylist3
+            mylist4.append(mydict)
+        print(mylist4)
+        return mylist4
+
+class VocabRcds(Resource):
+    @staticmethod
+    def get(id):
+        data = VocabRcdDao.hook(id)
+        return data, 200
+class VocabBulk(Resource):
+    @staticmethod
+    def get(id):
+        VocabRcdDao.hook2(id)
 if __name__ == '__main__':
     # corpus="The assets of Marble Faun Publishing Company suffered last quarter when one of their main local distributors went out of business."
     # VocabRcdPro.lemmatized(corpus,1,0,12)
