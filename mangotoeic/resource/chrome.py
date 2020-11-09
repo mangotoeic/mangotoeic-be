@@ -17,6 +17,9 @@ def sel_searching_data(driver, item, vocabdict):
     bs4Sel.sel_get_url(driver,'https://en.dict.naver.com/#/main')
     css='#ac_input'
     bs4Sel.sel_wait_by_css(driver,css)
+    err=bs4Sel.sel_wait_by_css(driver,css)
+    if not err:
+        return vocabdict
     element=bs4Sel.sel_get_element_by_css(driver,css)
     err=bs4Sel.sel_wait_by_css(driver,css)
     if not err:

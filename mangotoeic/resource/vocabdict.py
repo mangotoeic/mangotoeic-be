@@ -14,6 +14,9 @@ class VocabdictPro:
         self.fpath = os.path.join(basedir, './data/vocabdict.pickle')
         self.fpath2 = os.path.join(basedir, './data/vocabdict2.pickle')
         self.fpath3 = os.path.join(basedir, './data/vocabdict3.pickle')
+        self.fpath4 = os.path.join(basedir, './data/vocabdict4.pickle')
+        self.fpath5 = os.path.join(basedir, './data/vocabdict5.pickle')
+        self.fpath6 = os.path.join(basedir, './data/vocabdict6.pickle')
     
     def hook(self):
         mylist=self.fileread()
@@ -26,14 +29,26 @@ class VocabdictPro:
             data2 = pickle.load(f)
         with open(self.fpath3, 'rb') as f:
             data3 = pickle.load(f)
-        vlist = ([str(elem) for elem in data.values()])
-        vlist2 = ([str(elem) for elem in data2.values()])
-        vlist3 = ([str(elem) for elem in data3.values()])
+        with open(self.fpath4, 'rb') as f:
+            data4 = pickle.load(f)
+        with open(self.fpath5, 'rb') as f:
+            data5 = pickle.load(f)
+        with open(self.fpath6, 'rb') as f:
+            data6 = pickle.load(f)
+        # vlist = ([str(elem) for elem in data.values()])
+        # vlist2 = ([str(elem) for elem in data2.values()])
+        # vlist3 = ([str(elem) for elem in data3.values()])
         df = pd.DataFrame.from_dict(data, orient='index')
         df2 = pd.DataFrame.from_dict(data2, orient='index')
         df3 = pd.DataFrame.from_dict(data3, orient='index')
+        df4 = pd.DataFrame.from_dict(data4, orient='index')
+        df5 = pd.DataFrame.from_dict(data5, orient='index')
+        df6 = pd.DataFrame.from_dict(data6, orient='index')
         df = df.append(df2)
         df = df.append(df3)
+        df = df.append(df4)
+        df = df.append(df5)
+        df = df.append(df6)
         # print(df)
         mylist=[]
         df.apply(lambda x: mylist.append(x))
