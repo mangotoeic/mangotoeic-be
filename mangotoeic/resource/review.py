@@ -346,7 +346,7 @@ class ReviewDto(db.Model):
             'id' : self.id,
             'email' : self.email,
             'review' : self.review,
-            'star' : self.star
+            'star' : self.star 
         }
 
 class ReviewVo:
@@ -373,7 +373,7 @@ class ReviewService(object):
         predictions = rnnmodel.predict(reviewtext)
         prob = predictions[-1][np.argmax(predictions[-1])]*100
         prob = round(prob, 2)
-        star = int(np.argmax(predictions[-1])) + 1
+        star = int(np.argmax(predictions[-1]))
         return [prob,star]
         
 
@@ -539,6 +539,7 @@ class Reviews(Resource):
     @staticmethod
     def get():
         df = pd.read_sql_table('reviews', engine.connect()) 
+        df.star = df.star + 1
         return json.loads(df.iloc[::-1].to_json(orient = 'records'))
 
     @staticmethod
