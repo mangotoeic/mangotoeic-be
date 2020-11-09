@@ -1,4 +1,5 @@
 from mangotoeic.resource.vocablist import VocablistDto
+from mangotoeic.resource.vocabdict import VocabdictDto
 from selenium import webdriver
 import pandas as pd
 import json
@@ -66,7 +67,7 @@ class VocabDao(VocabDto):
     
     @classmethod
     def find_by_id(cls, userid):
-        driver =webdriver.PhantomJS('/usr/local/bin/phantomjs')
+        # driver =webdriver.PhantomJS('/usr/local/bin/phantomjs')
         p = VocabDto.query.filter_by(user_id = userid).all()
         vocablist = []
         # print(p)
@@ -74,16 +75,16 @@ class VocabDao(VocabDto):
             vocab=item.vocab
             vocabdict={}
             print(vocab)
-            q = VocablistDto.query.filter_by(vocab=vocab).first()
+            q = VocabdictDto.query.filter_by(vocab=vocab).all()
             print(q)
             mylist2=[]
             if not q:
                 continue
-            for i in q.vocabs2:
+            for i in q:
                 # vocabdict = sel_searching_data(driver, vocab, vocabdict)
                 # print(vocabdict)
 
-                
+                 
                 mylist2.append(i.meaning)
             vocabdict[vocab]=mylist2
             vocablist.append(vocabdict)

@@ -5,7 +5,7 @@ from mangotoeic.resource.user import User, Users, Auth, Access, Profile
 from mangotoeic.resource.preinfo import PreInfo
 from mangotoeic.home.api import Home
 from mangotoeic.resource.legacy import Legacy, Legacies
-from mangotoeic.resource.bookmark import Bookmark, Bookmarks
+from mangotoeic.resource.bookmark import Bookmark, Bookmarks ,BookmarksToOdap
 from mangotoeic.resource.newq import NewQ , NewQs
 from mangotoeic.resource.recommendation import Recommendation
 from mangotoeic.resource.odap import Odap, Odaps
@@ -24,6 +24,7 @@ odap = Blueprint('odap', __name__, url_prefix='/api/odap')
 
 bookmark = Blueprint('bookmark', __name__, url_prefix='/api/bookmark')
 bookmarks = Blueprint('bookmarks', __name__, url_prefix='/api/bookmarks/<int:id>')
+bookmarkstoodap = Blueprint('bookmarkstoodap', __name__, url_prefix='/api/bookmarks-to-odap/<int:id>')
 
 vocabs = Blueprint('vocabs', __name__, url_prefix='/api/vocabs')
 vocab = Blueprint('vocab', __name__, url_prefix='/api/vocab/<int:id>')
@@ -53,6 +54,7 @@ api = Api(legacies)
 api = Api(odaps)
 api = Api(odap)
 api = Api(bookmarks)
+api = Api(bookmarkstoodap)
 api = Api(bookmark)
 api = Api(vocabs)
 api = Api(vocab)
@@ -71,6 +73,7 @@ api = Api(minitests)
 api = Api(nextminiset)
 api = Api(newqs)
 
+
 def initialize_routes(api):
     api.add_resource(Home, '/api')
     api.add_resource(User, '/api/user')
@@ -84,6 +87,7 @@ def initialize_routes(api):
     api.add_resource(Odap, '/api/odap')
     api.add_resource(Bookmark, '/api/bookmark')
     api.add_resource(Bookmarks, '/api/bookmarks/<int:id>')
+    api.add_resource(BookmarksToOdap, '/api/bookmarks-to-odap/<int:id>')
     api.add_resource(Vocabs, '/api/vocabs')
     api.add_resource(Vocab, '/api/vocab/<int:id>')
     api.add_resource(Access, '/api/access')

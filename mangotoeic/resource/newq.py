@@ -23,7 +23,7 @@ class  NewQDto(db.Model):
     __tablename__ ="newQs"
     __table_args__={'mysql_collate':'utf8_general_ci'}
     qId = db.Column(db.Integer, primary_key = True, index = True)
-    question = db.Column(db.VARCHAR(300))
+    question = db.Column(db.VARCHAR(500))
     ansA = db.Column(db.CHAR(255))
     ansB = db.Column(db.CHAR(255))
     ansC = db.Column(db.CHAR(255))
@@ -164,6 +164,7 @@ class NewQs(Resource):
     @staticmethod
     def post():
         body=request.get_json()
+        print(body)
         text=body['text']
         mylist=NewQDao.hook(text)        
         return mylist , 200
