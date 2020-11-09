@@ -83,6 +83,7 @@ class VocabRcdPro:
         vlist= [item.replace(r"'",'') for item in vlist ]
         vlist= [item.replace(r"0-9",'') for item in vlist]
         vlist= [item.replace(r"-",'') for item in vlist ]
+        vlist= [item.replace(r"[0-9]",'') for item in vlist]
         vlist= [item.replace(r"0-9",'') for item in vlist]
         stop_words = nltk.corpus.stopwords.words('english')
         new_words = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'mr', 'ms', 'new', 'old', 'u', 'st', 'nd', 'rd', 'th']
