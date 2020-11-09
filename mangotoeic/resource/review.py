@@ -43,7 +43,6 @@ from keras.utils import np_utils
  
 # from konlpy.tag import Kkma 시간 오래걸려
 
-
 from sklearn.model_selection import train_test_split
 
 class Prepro():
