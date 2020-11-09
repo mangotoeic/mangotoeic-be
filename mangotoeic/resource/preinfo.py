@@ -86,7 +86,19 @@ class PreInfo(Resource):
         body = request.get_json()
         print("+++=++"*30,body)
         PreInfoDao.add_preinfo(body)
-
+class Count(Resource):
+    @staticmethod
+    def post():
+        body = request.get_json()
+        userdto=UserDto.query.filter_by(email=body['email']).first()
+        user_id= userdto.user_id
+        preinfodto=PreInfoDto.query.filter_by(user_id=user_id).first()
+        count=0
+        if not preinfodto:
+            count=0
+        if preinfodto:
+            count=1
+        return count ,200            
 # class TestResults(Resource):
 #     @staticmethod
 #     def post():

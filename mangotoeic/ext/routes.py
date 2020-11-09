@@ -2,7 +2,7 @@ import logging
 from flask import Blueprint
 from flask_restful import Api
 from mangotoeic.resource.user import User, Users, Auth, Access, Profile 
-from mangotoeic.resource.preinfo import PreInfo
+from mangotoeic.resource.preinfo import PreInfo,Count
 from mangotoeic.home.api import Home
 from mangotoeic.resource.legacy import Legacy, Legacies
 from mangotoeic.resource.bookmark import Bookmark, Bookmarks ,BookmarksToOdap
@@ -46,10 +46,11 @@ review2 = Blueprint('review2', __name__, url_prefix='/api/review2/')
 reviews = Blueprint('reviews', __name__, url_prefix='/api/reviews') 
 
 preinfo = Blueprint('diagnosis', __name__, url_prefix='/api/preinfo')
+count = Blueprint('diagnosis', __name__, url_prefix='/api/count')
 selectedqs = Blueprint('selectedq', __name__, url_prefix='/api/selectedqs')
 minitests = Blueprint('minitests', __name__, url_prefix='/api/minitests')
 nextminiset = Blueprint('nextminiset', __name__, url_prefix='/api/nextminiset/<int:id>')
-
+api = Api(count)
 api = Api(legacy)
 api = Api(legacies)
 api = Api(odaps)
@@ -96,6 +97,7 @@ def initialize_routes(api):
     api.add_resource(TestResult, '/api/testresult/<int:id>')
     api.add_resource(TestResults, '/api/testresults')
     api.add_resource(PreInfo, '/api/preinfo')
+    api.add_resource(Count, '/api/count')
     api.add_resource(Profile, '/api/profile/<int:id>')
     api.add_resource(SelectedQs, '/api/selectedqs')
     api.add_resource(Minitests, '/api/minitests')
