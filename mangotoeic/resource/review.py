@@ -22,6 +22,7 @@ import json
 
 import pandas as pd 
 import numpy as np
+from decimal import Decimal
 import matplotlib.pyplot as plt
 from konlpy.tag import Okt
 
@@ -37,7 +38,7 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing import sequence 
 
 from keras.models import Sequential 
-from keras.layers import Dense, LSTM, Embedding
+from keras.layers import Dense, LSTM, Embedding, SimpleRNN
 from keras.utils import np_utils
  
 # from konlpy.tag import Kkma 시간 오래걸려
@@ -74,7 +75,8 @@ class Prepro():
         print(X_test)
         print(y_test)
 
-        Prepro.accuracy_by_keras_LSTM(X_train, X_test, y_train, y_test, vocab_size_for_embedding = vocabs)
+        # Prepro.accuracy_by_keras_LSTM(X_train, X_test, y_train, y_test, vocab_size_for_embedding = vocabs)
+        Prepro.accuracy_by_keras_RNN(X_train, X_test, y_train, y_test, vocab_size_for_embedding = vocabs)
 
     
         
@@ -98,6 +100,7 @@ class Prepro():
         review_data = reader.csv_to_dframe()
  
         return review_data.iloc[10409:12409,:]
+        # .iloc[10409:12409,:]
 
 
     @staticmethod
@@ -164,6 +167,19 @@ class Prepro():
         print('테스트 정확도 : {:.2f}%'.format(seq.evaluate(X_test,y_test)[1]*100))
 
         return seq.evaluate(X_test,y_test)
+
+    @staticmethod
+    def accuracy_by_keras_RNN(X_train,X_test,y_train,y_test,vocab_size_for_embedding):
+        seq = Sequential()
+        seq.add(Embedding(vocab_size_for_embedding+1,120))
+        seq.add(SimpleRNN(16))
+        seq.add(Dense(5, activation='softmax'))
+        seq.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        run = seq.fit(X_train, y_train, epochs=10, batch_size=10, validation_split=0.1)
+        seq.save("rnn_review_star_model.h5")
+        print('테스트 정확도 : {:.2f}%'.format(seq.evaluate(X_test,y_test)[1]*100))
+
+        return seq.evaluate(X_test,y_test)        
  
     @staticmethod
     def one_hot_encoding(col):
@@ -504,6 +520,18 @@ class Review2(Resource):
         ReviewDao.delete(args.id)
         print('review remove complete!')
         return {'code' :0, 'message' : 'Success'}, 200
+    
+ 
+
+    @staticmethod
+    def get(): 
+        Session = openSession()
+        session = Session()
+        result = session.execute('select avg(star) from reviews;')
+        data = result.first()
+        result = round(data[0],2)  
+        return str(result), 200
+
 
         
 class Reviews(Resource): 
@@ -520,3 +548,5 @@ class Reviews(Resource):
 
 
 
+# a= Prepro()
+# a.hook_process()

@@ -70,6 +70,8 @@ class Minitests(Resource):
         minvalue= 100
         minuser=None
         for user in users:
+            if user.user_id>=17:
+                continue
             rcddtos=RecommendationDto.query.filter_by(user_id=user.user_id).all()
             # print(rcddtos)
             mylist=body['qId']
@@ -116,7 +118,7 @@ class Minitests(Resource):
         for mfdto in mfdtos:
             # mfdto중 가장 중간 오답률을 찾는다
             difference=median-mfdto.correctAvg
-            if abs(difference)>0.25:
+            if abs(difference)>0.5:
                 continue
             if difference < 0: #맞출확률이 높다면
                 x=random.randint(0,1)
