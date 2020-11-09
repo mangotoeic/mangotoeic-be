@@ -67,8 +67,8 @@ class Minitests(Resource):
         # df=RecommendationDao.pivot_table_build()
         users=UserDto.query.all()
         # print(users)
-        maxvalue=0
-        maxuser=None
+        minvalue= 100
+        minuser=None
         for user in users:
             rcddtos=RecommendationDto.query.filter_by(user_id=user.user_id).all()
             # print(rcddtos)
@@ -98,13 +98,13 @@ class Minitests(Resource):
                     value=abs(avg_of_user_from_rcd-minidto.user_avg)
                     sum+=value
             corrent_value=sum
-            if corrent_value>maxvalue:
-                maxvalue=corrent_value
-                maxuser=user.user_id
+            if corrent_value<minvalue:
+                minvalue=corrent_value
+                minuser=user.user_id
             
-        print(maxuser)
-        print(maxvalue)
-        q=PredictMFDto.query.filter_by(user_id=maxuser)
+        print(minuser)
+        print(minvalue)
+        q=PredictMFDto.query.filter_by(user_id=minuser)
         df= pd.read_sql(q.statement,q.session.bind)
         df_sorted_by_values=df.sort_values(by='correctAvg',ascending =False)
         print(df_sorted_by_values)
@@ -116,7 +116,7 @@ class Minitests(Resource):
         for mfdto in mfdtos:
             # mfdto중 가장 중간 오답률을 찾는다
             difference=median-mfdto.correctAvg
-            if abs(difference)>0.5:
+            if abs(difference)>0.25:
                 continue
             if difference < 0: #맞출확률이 높다면
                 x=random.randint(0,1)
