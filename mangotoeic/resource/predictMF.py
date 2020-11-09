@@ -4,23 +4,32 @@ from typing import List
 from flask_restful import Resource, reqparse
 from sqlalchemy import func
 import os
+import pickle
 basedir = os.path.dirname(os.path.abspath(__file__))     
 class PredictMFPro:
     def __init__(self):
         ...
     def read_csv(self):
         df=pd.read_csv(os.path.join(basedir, "./data/unstack.csv"))
-        return df
+        with open(os.path.join(basedir,'./data/idx2qId.pickle'),'rb') as f:
+            data=pickle.load(f)
+        with open(os.path.join(basedir,'./data/idx2userid.pickle'),'rb') as f:
+            data2=pickle.load(f)
+        return df ,data,data2
     def hook(self):
-        df=self.read_csv()
-        df=self.prepro(df)
+        df,data,data2=self.read_csv()
+        df=self.prepro(df,data,data2)
         return df
-    def prepro(self,df):
+    def prepro(self,df,data,data2):
         print(df)
+        print(data)
+        print(data2)
         df=df.rename(columns={"Unnamed: 0" : "qId", 'Unnamed: 1': 'user_id',"0" :"correctAvg"})
         df.index.names=['id']
-        df['user_id']+=1
-        df['qId']+=1
+        df['qId']=df['qId'].astype(str)
+        df['user_id']=df['user_id'].astype(str)
+        df=df.replace({"qId":data,"user_id":data2})
+        df
         print(df)
         return df
 
