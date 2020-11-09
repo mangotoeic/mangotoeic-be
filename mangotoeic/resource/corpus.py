@@ -22,9 +22,7 @@ class  CorpusDto(db.Model):
     __table_args__={'mysql_collate':'utf8_general_ci'}
     corId= db.Column(db.Integer, primary_key = True, index = True)
     corpus = db.Column(db.VARCHAR(200))
-    def __init__(self, corId, corpus):
-        self.corId = corId
-        self.corpus  = corpus 
+    
        
 
     def __repr__(self):
