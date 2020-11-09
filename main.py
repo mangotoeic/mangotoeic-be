@@ -99,6 +99,5 @@ with app.app_context():
     print(f'*****PredictMF Total Count is {predict_count} *****')
     if predict_count[0] == 0 :
         PredictMFDao.bulk()
-    VocabRcdDao.set_datas_from_user_id(16)
 initialize_routes(api)
  
