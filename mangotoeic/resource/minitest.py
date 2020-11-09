@@ -70,6 +70,8 @@ class Minitests(Resource):
         minvalue= 100
         minuser=None
         for user in users:
+            if user.user_id>=17:
+                continue
             rcddtos=RecommendationDto.query.filter_by(user_id=user.user_id).all()
             # print(rcddtos)
             mylist=body['qId']
