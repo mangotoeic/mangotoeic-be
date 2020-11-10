@@ -27,6 +27,7 @@ class UserDto(db.Model):
     bookmark = db.relationship("BookmarkDto", backref='user',lazy=True)
     recommendation = db.relationship("RecommendationDto", backref='user',lazy=True)
     minitest = db.relationship("MinitestDto", backref='user',lazy=True)
+    vocabrcd = db.relationship("VocabRcdDto", backref='user',lazy=True)
     
     def __repr__(self):
         return f'user_id={self.user_id}, user_name={self.user_name} password={self.password}, email={self.email}'
@@ -159,6 +160,15 @@ class User(Resource):
         #     return {'code' : 0, 'message' : 'SUCCESS'}, 200    
         # except:
         #     return {'message': 'An error occured inserting the user'}, 500
+    
+    @staticmethod
+    def get(): 
+        Session = openSession()
+        session = Session()
+        result = session.execute('select count(*) from users;')
+        data = result.first()
+        result = int(data[0])  
+        return result, 200
 
     # @staticmethod
     # def get():

@@ -32,8 +32,9 @@ class VocablistDto(db.Model):
     __table_args__={'mysql_collate':'utf8_general_ci'}
     # id = db.Column(db.Integer,primary_key=True, index=True)
     vocab = db.Column(db.String(50),primary_key=True)
-    vocabs = db.relationship("VocabDto", backref='vocablist2',lazy=True)
-    vocabs2 = db.relationship("VocabdictDto", backref='vocablist',lazy=True) 
+    vocabs = db.relationship("VocabDto", backref='vocablist',lazy=True)
+    vocabs2 = db.relationship("VocabdictDto", backref='vocablist',lazy=True)
+    vocabpredict = db.relationship("PredictVocabDto", backref='vocablist',lazy=True)
 
 class VocablistVo:
     vocab: str = ''

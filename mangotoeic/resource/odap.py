@@ -75,10 +75,17 @@ class OdapDao(OdapDto):
         user_id= data['user_id']
         print(user_id)
         for qid in data['qId']:
+            dtos= OdapDto.query.filter_by(user_id=user_id).all()
+            mylist=[]
+            for dto in dtos:
+                mylist.append(dto.qId)
+            if qid in mylist:
+                continue
             some_user=UserDto.query.filter_by(user_id=user_id).first()
             some_question=LegacyDto.query.filter_by(qId=qid).first()
             print(some_question)
             print(some_user)
+            
             x=OdapDto(user=some_user, legacy=some_question)
             db.session.add(x)    
         db.session.commit()

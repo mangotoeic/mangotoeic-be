@@ -67,7 +67,6 @@ class VocabDao(VocabDto):
     
     @classmethod
     def find_by_id(cls, userid):
-        # driver =webdriver.PhantomJS('/usr/local/bin/phantomjs')
         p = VocabDto.query.filter_by(user_id = userid).all()
         vocablist = []
         # print(p)

@@ -1,3 +1,4 @@
+import gc
 import lightgbm
 from flask.globals import session
 import pandas as pd
@@ -10,6 +11,7 @@ from mangotoeic.ext.db import db, openSession, engine
 from mangotoeic.ext.db import Base
 from mangotoeic.resource.user import UserDto
 from mangotoeic.resource.legacy import LegacyDto
+from flask import jsonify
 import json
 import joblib
 
@@ -141,9 +143,8 @@ class TestResultDao(TestResultDto):
 
     @staticmethod
     def add_testresult(data):
-        
         df=pd.DataFrame(data)
-        print(df)
+        # print(df)
         TestResultDao.bulk2(df)
       
 class TestResult(Resource):
@@ -153,9 +154,12 @@ class TestResult(Resource):
         data=db.session.query(TestResultDto).filter_by(user_id=id).first()
         pred_score = Lgbm.predict(id)
         user_pred_score = pred_score.iloc[0, 0]
-        print(user_pred_score)
-        print(data)
+        # print(user_pred_score)
+        # print(data)
         return [data.user_avg, user_pred_score], 200
+    
+    
+        
 
 class TestResults(Resource):
     @staticmethod
@@ -166,6 +170,14 @@ class TestResults(Resource):
         TestResultDao.add_testresult(body)
         TestResultDao.get_average()
 
+    @staticmethod
+    def get():
+        Session = openSession()
+        session = Session()
+        result = session.execute('select avg(user_avg) from testresult;')
+        data = result.first()
+        result = round(data[0] * 1000)
+        return result, 200
 
 class Lgbm():
     features = [
@@ -187,7 +199,7 @@ class Lgbm():
     @staticmethod
     def data_prepro():
         testresult_df = pd.read_sql_table('testresult', engine.connect())
-        testresult_df.rename(columns={'qId':'content_id'}, inplace=True) 
+        testresult_df.rename(columns={'qId':'content_id'}, inplace=True)
 
         grouped_by_user_df = testresult_df.groupby('user_id')
         user_answers_df = grouped_by_user_df.agg({'answered_correctly': ['mean', 'count', 'std', 'median', 'skew']}).copy()
@@ -197,10 +209,19 @@ class Lgbm():
         content_answers_df = grouped_by_content_df.agg({'answered_correctly': ['mean', 'count', 'std', 'median', 'skew'] }).copy()
         content_answers_df.columns = ['mean_accuracy', 'question_asked', 'std_accuracy', 'median_accuracy', 'skew_accuracy']
 
+        del grouped_by_user_df
+        del grouped_by_content_df
+
+        gc.collect()
+
+
         testresult_df = testresult_df.merge(user_answers_df, how='left', on='user_id')
-        testresult_df = testresult_df.merge(content_answers_df, how='left', on='content_id')
+        testresult_df = testresult_df.merge(content_answers_df, how='left', on='content_id')    
+
 
         testresult_df = testresult_df[Lgbm().features + [Lgbm().target]]
+        print(testresult_df)
+        testresult_df.to_csv('./geunhong4.csv')
         return testresult_df
 
 
@@ -209,19 +230,20 @@ class Lgbm():
         lgbm = Lgbm()
         testresult_df = lgbm.data_prepro()
         params = {
-            'bagging_fraction': 0.1817242323514327,
-            'feature_fraction': 0.1884588361650144,
-            'learning_rate': 0.12887924851375825, 
-            'max_depth': -1,
-            'min_child_samples': 20, 
-            'min_data_in_leaf': 1, 
-            'n_estimators': 100,
-            'num_leaves': 2,
-        }
+            'bagging_fraction': 0.5817242323514327,
+            'feature_fraction': 0.6884588361650144,
+            'learning_rate': 0.42887924851375825, 
+            'max_depth': 6,
+            'min_child_samples': 946, 
+            'min_data_in_leaf': 47, 
+            'n_estimators': 169,
+            'num_leaves': 29,
+            'random_state': 666
+        } 
         model = lightgbm.LGBMClassifier(**params)
         load_model = joblib.load('./mangotoeic/resource/data/lgb_test.pkl')
         new_model = model.fit(testresult_df[Lgbm().features], testresult_df[Lgbm().target], init_model=load_model)
-        joblib.dump(new_model, 'lgb_test2.pkl')
+        # joblib.dump(new_model, 'lgb_test2.pkl')
         return new_model
 
     @staticmethod
@@ -234,7 +256,7 @@ class Lgbm():
         test_df = test_df.merge(user_answer_df, how = 'left', on = 'user_id')
         test_df = test_df.merge(content_answer_df, how = 'left', on = 'content_id')
         test_df['user_id'] = id # 리액트에서 받아오는 user_id로 변경해야함
-        print(test_df)
+        # print(test_df)
         test_df['answered_correctly'] = new_model.predict_proba(test_df[Lgbm().features])[:,1]
         test_df = test_df[['row_id', 'user_id', 'content_id', 'answered_correctly']]
         result_group_by = test_df.groupby('user_id')
@@ -242,30 +264,6 @@ class Lgbm():
         result_groupby_user_answer.columns = ['mean_user_accuracy']
         # print(result_groupby_user_answer)
         return result_groupby_user_answer
-
-
-
-
-
-
-
-        # load_model = joblib.load('./data/lgb_test.pkl')
-
-        
-
-
-    # def post():
-    #     args = parser.parse_args()
-    #     print(f'User {args["id"]} added ')
-    #     params = json.loads(request.get_data(), encoding='utf-8')
-    #     if len(params) == 0:
-
-    #         return 'No parameter'
-
-    #     params_str = ''
-    #     for key in params.keys():
-    #         params_str += 'key: {}, value: {}<br>'.format(key, params[key])
-    #     return {'code':0, 'message': 'SUCCESS'}, 200
 
     @staticmethod
     def get(id: str):
@@ -275,27 +273,3 @@ class Lgbm():
                 return user.json()
         except Exception as e:
             return {'message': 'User not found'}, 404
-
-
-# class Auth(Resource):
-#     def post(self):
-#         body = request.get_json()
-#         user = UserDto(**body)
-#         UserDao.save(user)
-#         email = user.email
-#         password = user.password
-
-#         return {'email': str(email), 'password': str(password)}, 200 
-
-
-# class Access(Resource):
-#     def __init__(self):
-#         print('========== 5 ==========')
-#     def post(self):
-#         print('========== 6 ==========')
-#         args = parser.parse_args()
-#         user = UserVo()
-#         user.password = args.password
-#         user.email = args.email
-#         data = UserDao.login(user)
-#         return data[0], 200
