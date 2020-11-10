@@ -49,22 +49,8 @@ class MinitestDao(MinitestDto):
         session.execute('update minitest as t inner join (select user_id,qid, avg(answer_correctly) as av from minitest group by user_id, qId ) t1 on t.user_id = t1.user_id and t.qId= t1.qId  set t.user_qid_avg= t1.av;')
         session.commit()
         session.close()
-    
-class Minitest(Resource):
-    def post(self):
-        pass
-
-class Minitests(Resource):
     @staticmethod
-    def post():
-        body =request.get_json()
-        # body={ "user_id":1 , "qId":[1,2,3,4] ,"answer_correctly":[0,1,1,1] }
-        # print(body)
-        MinitestDao.bulk(body)
-        MinitestDao.get_average()
-        MinitestDao.get_average2()
-        
-        # df=RecommendationDao.pivot_table_build()
+    def hook( body):
         users=UserDto.query.all()
         # print(users)
         minvalue= 100
@@ -139,6 +125,22 @@ class Minitests(Resource):
             qId= item['qId']
             
             NextMiniSetDao.add(body['user_id'],qId)
+        return mylist3
+class Minitest(Resource):
+    def post(self):
+        pass
+
+class Minitests(Resource):
+    @staticmethod
+    def post():
+        body =request.get_json()
+        # body={ "user_id":1 , "qId":[1,2,3,4] ,"answer_correctly":[0,1,1,1] }
+        # print(body)
+        MinitestDao.bulk(body)
+        MinitestDao.get_average()
+        MinitestDao.get_average2()
+        mylist3=MinitestDao.hook(body)
+        # df=RecommendationDao.pivot_table_build()
         return mylist3 , 200
 
 
