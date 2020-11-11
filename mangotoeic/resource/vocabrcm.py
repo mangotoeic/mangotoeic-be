@@ -2,7 +2,6 @@ import numpy as np
 import nltk
 import string
 import re
-import fasttext
 import contractions
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords, wordnet
