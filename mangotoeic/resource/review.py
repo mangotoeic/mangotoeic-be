@@ -3,7 +3,7 @@ from flask import request
 from flask_restful import Resource, reqparse 
 from mangotoeic.ext.db import engine
 from flask import jsonify
-import keras
+# import keras
 import numpy as np
 from mangotoeic.ext.db import db, openSession
 from sqlalchemy import func
@@ -75,7 +75,7 @@ class Prepro():
         # print(y_test)
 
         # Prepro.accuracy_by_keras_LSTM(X_train, X_test, y_train, y_test, vocab_size_for_embedding = vocabs)
-        Prepro.accuracy_by_keras_RNN(X_train, X_test, y_train, y_test, vocab_size_for_embedding = vocabs)
+        # Prepro.accuracy_by_keras_RNN(X_train, X_test, y_train, y_test, vocab_size_for_embedding = vocabs)
 
     
         
@@ -378,12 +378,12 @@ class ReviewService(object):
         reviewtext = model.encoding(reviewtext)
         reviewtext = model.zeropadding(reviewtext)
 
-        rnnmodel = keras.models.load_model('RNN_review_star_model.h5')
-        predictions = rnnmodel.predict(reviewtext)
-        prob = predictions[-1][np.argmax(predictions[-1])]*100
-        prob = round(prob, 2)
-        star = int(np.argmax(predictions[-1]))
-        return [prob,star]
+        # rnnmodel = keras.models.load_model('RNN_review_star_model.h5')
+        # predictions = rnnmodel.predict(reviewtext)
+        # prob = predictions[-1][np.argmax(predictions[-1])]*100
+        # prob = round(prob, 2)
+        # star = int(np.argmax(predictions[-1]))
+        # return [prob,star]
         
 
 
