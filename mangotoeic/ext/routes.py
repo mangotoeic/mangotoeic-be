@@ -106,7 +106,6 @@ def initialize_routes(api):
     api.add_resource(SelectedQs, '/api/selectedqs')
     api.add_resource(Minitests, '/api/minitests')
     api.add_resource(NextMiniSet, '/api/nextminiset/<int:id>')
-    api.add_resource(NewQs, '/api/newqs')
 
 
     
