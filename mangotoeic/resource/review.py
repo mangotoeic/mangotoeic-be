@@ -558,5 +558,5 @@ class Reviews(Resource):
 
 
 
-a= Prepro()
-a.hook_process()
+# a= Prepro()
+# a.hook_process()
