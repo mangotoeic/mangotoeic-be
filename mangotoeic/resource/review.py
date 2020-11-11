@@ -178,16 +178,16 @@ class Prepro():
     @staticmethod
     def accuracy_by_keras_RNN(X_train,X_test,y_train,y_test,vocab_size_for_embedding):
         seq = Sequential()
-        seq.add(Embedding(vocab_size_for_embedding+1,8))
+        seq.add(Embedding(vocab_size_for_embedding+1,56))
         seq.add(SimpleRNN(16))
         seq.add(Dense(5, activation='softmax'))
         seq.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-        run = seq.fit(X_train, y_train, epochs=10, batch_size=10, validation_split=0.1)
+        run = seq.fit(X_train, y_train, epochs=10, batch_size=10, validation_split=0.25)
         plt.plot(run.history['loss'])
         plt.xlabel('epoch')
         plt.ylabel('loss')
         plt.show()
-        seq.save("2rnn_review_star_model.h5")
+        seq.save("RNN_review_star_model.h5")
         print('테스트 정확도 : {:.2f}%'.format(seq.evaluate(X_test,y_test)[1]*100))
 
         return seq.evaluate(X_test,y_test)        
