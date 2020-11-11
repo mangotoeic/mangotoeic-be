@@ -6,7 +6,6 @@ from mangotoeic.resource.preinfo import PreInfo,Count
 from mangotoeic.home.api import Home
 from mangotoeic.resource.legacy import Legacy, Legacies
 from mangotoeic.resource.bookmark import Bookmark, Bookmarks ,BookmarksToOdap
-from mangotoeic.resource.newq import NewQ , NewQs
 from mangotoeic.resource.recommendation import Recommendation
 from mangotoeic.resource.odap import Odap, Odaps
 from mangotoeic.resource.vocab import Vocab, Vocabs
@@ -17,7 +16,6 @@ from mangotoeic.resource.minitest import Minitest, Minitests
 from mangotoeic.resource.nextminiset import NextMiniSet
 from mangotoeic.resource.vocabrcm import VocabRcds, VocabBulk
 
-newqs = Blueprint('newqs', __name__, url_prefix='/api/newqs')
 legacies = Blueprint('legacies', __name__, url_prefix='/api/legacies')
 legacy = Blueprint('legacy', __name__, url_prefix='/api/legacy')
 
@@ -78,7 +76,6 @@ api = Api(reviews)
 api = Api(selectedqs)
 api = Api(minitests)
 api = Api(nextminiset)
-api = Api(newqs)
 
 
 def initialize_routes(api):
