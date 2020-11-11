@@ -98,6 +98,14 @@ class Prepro():
         reader.new_file()
         review_data = reader.csv_to_dframe()
 
+        """이메일 추가해주는 부분"""
+        # reader.context = os.path.join(basedir, 'data')
+        # reader.fname = "100-contacts.csv"
+        # reader.new_file()
+        # q = reader.csv_to_dframe()
+        # review_data.email[10409:12409] = q.email[3:2003]
+        # review_data.to_csv('앱리뷰csv파일2.csv')
+
         return review_data.iloc[10409:12409,:]
         # .iloc[10409:12409,:]
 
