@@ -31,15 +31,15 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 basedir = os.path.dirname(os.path.abspath(__file__))
-from tensorflow import keras
+# from tensorflow import keras
 
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.preprocessing import sequence 
+# from tensorflow.keras.preprocessing.text import Tokenizer
+# from tensorflow.keras.preprocessing.sequence import pad_sequences
+# from tensorflow.keras.preprocessing import sequence 
 
-from keras.models import Sequential 
-from keras.layers import Dense, LSTM, Embedding, SimpleRNN
-from keras.utils import np_utils
+# from keras.models import Sequential 
+# from keras.layers import Dense, LSTM, Embedding, SimpleRNN
+# from keras.utils import np_utils
  
 # from konlpy.tag import Kkma 시간 오래걸려
 
@@ -123,26 +123,26 @@ class Prepro():
             wordtoken_list.append(onereview) 
         return wordtoken_list
 
-    @staticmethod
-    def vocab_size (tokenlist):
-        tokenizer = Tokenizer()
-        tokenizer.fit_on_texts(tokenlist)
-        vocabs = len(tokenizer.word_index)
-        print(f'총 단어 수 : {vocabs}')
-        return vocabs
+    # @staticmethod
+    # def vocab_size (tokenlist):
+    #     tokenizer = Tokenizer()
+    #     tokenizer.fit_on_texts(tokenlist)
+    #     vocabs = len(tokenizer.word_index)
+    #     print(f'총 단어 수 : {vocabs}')
+    #     return vocabs
 
-    @staticmethod
-    def encoding(tokenlist): 
-        tokenizer = Tokenizer()
-        tokenizer.fit_on_texts(tokenlist)
-        return tokenizer.texts_to_sequences(tokenlist)
+    # @staticmethod
+    # def encoding(tokenlist): 
+    #     tokenizer = Tokenizer()
+    #     tokenizer.fit_on_texts(tokenlist)
+    #     return tokenizer.texts_to_sequences(tokenlist)
 
     
 
-    @staticmethod
-    def zeropadding(encodedlist):
-        padded = pad_sequences(encodedlist, padding = 'post', maxlen = 200)
-        return padded
+    # @staticmethod
+    # def zeropadding(encodedlist):
+    #     padded = pad_sequences(encodedlist, padding = 'post', maxlen = 200)
+    #     return padded
 
     @staticmethod 
     def split(X,y):
@@ -162,39 +162,39 @@ class Prepro():
     def drop_col(df, col):
         return df.drop([col], axis = 1)
 
-    @staticmethod
-    def accuracy_by_keras_LSTM(X_train,X_test,y_train,y_test,vocab_size_for_embedding):
-        seq = Sequential()
-        seq.add(Embedding(vocab_size_for_embedding+1,100))
-        seq.add(LSTM(150))
-        seq.add(Dense(6, activation='softmax'))
-        seq.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-        run = seq.fit(X_train, y_train, epochs=4, batch_size=10, validation_split=0.1)
-        seq.save("review_star_model")
-        print('테스트 정확도 : {:.2f}%'.format(seq.evaluate(X_test,y_test)[1]*100))
+    # @staticmethod
+    # def accuracy_by_keras_LSTM(X_train,X_test,y_train,y_test,vocab_size_for_embedding):
+    #     seq = Sequential()
+    #     seq.add(Embedding(vocab_size_for_embedding+1,100))
+    #     seq.add(LSTM(150))
+    #     seq.add(Dense(6, activation='softmax'))
+    #     seq.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    #     run = seq.fit(X_train, y_train, epochs=4, batch_size=10, validation_split=0.1)
+    #     seq.save("review_star_model")
+    #     print('테스트 정확도 : {:.2f}%'.format(seq.evaluate(X_test,y_test)[1]*100))
 
-        return seq.evaluate(X_test,y_test)
+    #     return seq.evaluate(X_test,y_test)
 
-    @staticmethod
-    def accuracy_by_keras_RNN(X_train,X_test,y_train,y_test,vocab_size_for_embedding):
-        seq = Sequential()
-        seq.add(Embedding(vocab_size_for_embedding+1,8))
-        seq.add(SimpleRNN(16))
-        seq.add(Dense(5, activation='softmax'))
-        seq.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-        run = seq.fit(X_train, y_train, epochs=10, batch_size=10, validation_split=0.1)
-        plt.plot(run.history['loss'])
-        plt.xlabel('epoch')
-        plt.ylabel('loss')
-        plt.show()
-        seq.save("2rnn_review_star_model.h5")
-        print('테스트 정확도 : {:.2f}%'.format(seq.evaluate(X_test,y_test)[1]*100))
+    # @staticmethod
+    # def accuracy_by_keras_RNN(X_train,X_test,y_train,y_test,vocab_size_for_embedding):
+    #     seq = Sequential()
+    #     seq.add(Embedding(vocab_size_for_embedding+1,8))
+    #     seq.add(SimpleRNN(16))
+    #     seq.add(Dense(5, activation='softmax'))
+    #     seq.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    #     run = seq.fit(X_train, y_train, epochs=10, batch_size=10, validation_split=0.1)
+    #     plt.plot(run.history['loss'])
+    #     plt.xlabel('epoch')
+    #     plt.ylabel('loss')
+    #     plt.show()
+    #     seq.save("2rnn_review_star_model.h5")
+    #     print('테스트 정확도 : {:.2f}%'.format(seq.evaluate(X_test,y_test)[1]*100))
 
-        return seq.evaluate(X_test,y_test)        
+    #     return seq.evaluate(X_test,y_test)        
  
-    @staticmethod
-    def one_hot_encoding(col):
-        return np_utils.to_categorical(col)
+    # @staticmethod
+    # def one_hot_encoding(col):
+    #     return np_utils.to_categorical(col)
 
 
 
@@ -558,5 +558,5 @@ class Reviews(Resource):
 
 
 
-a= Prepro()
-a.hook_process()
+# a= Prepro()
+# a.hook_process()
