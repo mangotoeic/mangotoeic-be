@@ -97,7 +97,7 @@ class Prepro():
         reader.fname = "앱리뷰csv파일2.csv"
         reader.new_file()
         review_data = reader.csv_to_dframe()
- 
+
         return review_data.iloc[10409:12409,:]
         # .iloc[10409:12409,:]
 
@@ -146,7 +146,7 @@ class Prepro():
         print('리뷰 최대 길이 : {}'.format(max(len(l) for l in X))) 
         print('리뷰 평균 길이 : {}'.format(sum(map(len, X)) / len(X))) 
         plt.hist([len(s) for s in X], bins=50) 
-        plt.xlabel('리뷰 길이') 
+        plt.xlabel('review length') 
         plt.ylabel('number of Data') 
         plt.show()
     
@@ -175,7 +175,11 @@ class Prepro():
         seq.add(Dense(5, activation='softmax'))
         seq.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
         run = seq.fit(X_train, y_train, epochs=10, batch_size=10, validation_split=0.1)
-        seq.save("rnn_review_star_model.h5")
+        plt.plot(run.history['loss'])
+        plt.xlabel('epoch')
+        plt.ylabel('loss')
+        plt.show()
+        seq.save("2rnn_review_star_model.h5")
         print('테스트 정확도 : {:.2f}%'.format(seq.evaluate(X_test,y_test)[1]*100))
 
         return seq.evaluate(X_test,y_test)        
@@ -197,13 +201,11 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 basedir = os.path.dirname(os.path.abspath(__file__))
-import glob
-import sqlite3
+
 import json
 import re
 import pandas as pd
-from bs4 import BeautifulSoup
-from urllib.request import urlopen, Request
+from bs4 import BeautifulSoup 
 
 from mangotoeic.utils.file_helper import FileReader
 from selenium import webdriver
