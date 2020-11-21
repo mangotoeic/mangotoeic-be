@@ -6,6 +6,5 @@
 >>>>>>> master
 =======
     "python.pythonPath": "/Users/kwonhyunah/opt/anaconda3/envs/new/bin/python",
->>>>>>> master
-    "python.dataScience.jupyterServerURI": "local"
+    "jupyter.jupyterServerType": "local"
 }

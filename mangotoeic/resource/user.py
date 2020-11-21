@@ -23,11 +23,7 @@ class UserDto(db.Model):
     user_name = db.Column(db.String(20))
     password = db.Column(db.String(20))
     email = db.Column(db.String(20))
-    odap = db.relationship("OdapDto", backref='user',lazy=True)
-    bookmark = db.relationship("BookmarkDto", backref='user',lazy=True)
-    recommendation = db.relationship("RecommendationDto", backref='user',lazy=True)
-    minitest = db.relationship("MinitestDto", backref='user',lazy=True)
-    vocabrcd = db.relationship("VocabRcdDto", backref='user',lazy=True)
+    
     
     def __repr__(self):
         return f'user_id={self.user_id}, user_name={self.user_name} password={self.password}, email={self.email}'
@@ -231,10 +227,12 @@ class Access(Resource):
     def post(self):
         print('========== 6 ==========')
         args = parser.parse_args()
+        
         user = UserDto()
         user.password = args.password
         user.email = args.email
         data = UserDao.login(user)
+        print(data)
         return data[0], 200
 
 class Profile(Resource):
